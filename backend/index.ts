@@ -31,7 +31,9 @@ if(process.env.NODE_ENV === 'development'){
 
 // Routes
 
+import { MainRouter } from './route/index.ts';
 
+app.use('/api', MainRouter);
 
 // Routes
 

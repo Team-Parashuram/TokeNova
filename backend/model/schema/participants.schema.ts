@@ -1,5 +1,6 @@
+import bcrypt from 'bcryptjs';
 import { Schema } from "mongoose";
-import { Participant } from "../types/main.types";
+import { Participant } from "../types/main.types.ts";
 
 const participantSchema = new Schema<Participant>(
     {
@@ -30,6 +31,20 @@ const participantSchema = new Schema<Participant>(
         timestamps: true
     }
 )
+
+participantSchema.pre('save',async function(next){
+    if(!this.isModified('password')){
+        return next();
+    }
+
+    try{
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+        return next();
+    }catch(error){
+        return next(error as Error);
+    }
+})
 
 export {
     participantSchema

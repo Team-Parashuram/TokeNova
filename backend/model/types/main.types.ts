@@ -1,32 +1,34 @@
-import mongoose, { Document } from "mongoose";
+import { Document, Schema } from "mongoose";
 
-interface Event extends Document {
-    date : Date;
-    price : number;
-    title : string;
-    location : string;
-    description : string;
-    eventOrganiserId : mongoose.ObjectId;
+interface EventInterface extends Document {
+    date: Date;
+    price: number;
+    seats: number;
+    title: string;
+    location: string;
+    description: string;
+    participants: Schema.Types.ObjectId[];
+    eventOrganiserId: Schema.Types.ObjectId;
 }
 
-interface EventOrganiser extends Document {
-    name : string;
-    email : string;
-    phone : string;
-    events: Event[];
-    password : string;
+interface EventOrganiserInterface extends Document {
+    name: string;
+    email: string;
+    phone?: string;
+    events: Schema.Types.ObjectId[];
+    password: string;
 }
 
-interface Participant extends Document {
-    name : string | "";
-    email : string;
-    phone : Number | "";
-    events : Event[];
-    password : string;
+interface ParticipantInterface extends Document {
+    name?: string;
+    email: string;
+    phone?: string;
+    events: Schema.Types.ObjectId[];
+    password: string;
 }
 
 export {
-    Event,
-    Participant,
-    EventOrganiser,
-}
+    EventInterface,
+    ParticipantInterface,
+    EventOrganiserInterface,
+};

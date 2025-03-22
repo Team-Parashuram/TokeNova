@@ -1,17 +1,15 @@
 import { Response } from 'express';
 
-const ResponseApi = (
+export const apiResponse = <T>(
   res: Response,
   status: number,
   message: string,
-  data: any = [],
+  data: T = {} as T,
   token?: string
 ) => {
   res.status(status).json({
-    message,
-    data,
-    token,
+    message: message,
+    data: data,
+    token: token ?? '',
   });
 };
-
-export default ResponseApi;

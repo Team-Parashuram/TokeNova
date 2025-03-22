@@ -1,8 +1,14 @@
 import { Schema } from "mongoose";
-import { Event } from "../types/main.types";
+import { Event } from "../types/main.types.ts";
 
 const EventSchema = new Schema<Event>(
     {
+        participants: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'Participant'
+            }
+        ],
         date: {
             type: Date,
             required: [true, 'Date is required']
@@ -13,15 +19,19 @@ const EventSchema = new Schema<Event>(
         },
         title: {
             type: String,
-            required: [true,"Title is required"]
+            required: [true, "Title is required"]
+        },
+        seats: {
+            type: Number,
+            required: [true, "Seats is required"]
         },
         location: {
             type: String,
-            required: true
+            required: [true, "Location is required"]
         },
         description: {
             type: String,
-            required: true
+            required: [true, "Description is required"]
         },
         eventOrganiserId: {
             type: Schema.Types.ObjectId,
@@ -32,15 +42,8 @@ const EventSchema = new Schema<Event>(
     {
         timestamps: true
     }
-)
+);
 
-export {
+export { 
     EventSchema
-}
-
-// date : Date;
-// price : number;
-// title : string;
-// location : string;
-// description : string;
-// eventOrganiserId : string;
+};
