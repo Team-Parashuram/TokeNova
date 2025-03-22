@@ -54,24 +54,24 @@ class EventBookingAgent:
         """Add a message to the conversation history."""
         self.conversation_history.append({"role": role, "content": content})
         
-    async def chat(self, user_input: str):
+    def chat(self, user_input: str):
         """Process user input and generate a response."""
         self._add_to_history("user", user_input)
         
         # Analyze the user input to determine intent
-        intent = await self._determine_intent(user_input)
+        intent = self._determine_intent(user_input)
         
         if intent == "greet":
             response = "Hello! I'm your event booking assistant. I can help you find and book tickets for events. What kind of event are you looking for?"
         
         elif intent == "book_event":
             # Extract event details from user query
-            event_details = await self._extract_event_details(user_input)
+            event_details = self._extract_event_details(user_input)
             if not event_details or not event_details.get('event_type'):
                 response = "Could you please tell me more about the event you're interested in? For example, the name, type, or date of the event."
             else:
                 # Search for available events
-                available_events = await self._search_events(event_details)
+                available_events = self._search_events(event_details)
                 if not available_events:
                     response = "I couldn't find any events matching your criteria. Could you try with different details?"
                 else:
@@ -81,13 +81,13 @@ class EventBookingAgent:
         
         elif intent == "select_event":
             # Extract which event the user selected
-            selected_event = await self._extract_selected_event(user_input)
+            selected_event = self._extract_selected_event(user_input)
             if not selected_event:
                 response = "I'm not sure which event you're referring to. Could you please specify the event number or name?"
             else:
                 # Get ticket details for the selected event
                 event_address = selected_event.get('address')
-                ticket_details = await self._get_ticket_details(event_address)
+                ticket_details = self._get_ticket_details(event_address)
                 
                 response = (f"You've selected: {selected_event.get('name')}\n\n"
                            f"Price per ticket: {Web3.from_wei(ticket_details.get('price', 0), 'ether')} ETH\n"
@@ -96,7 +96,7 @@ class EventBookingAgent:
         
         elif intent == "purchase_tickets":
             # Extract number of tickets
-            num_tickets, event_address = await self._extract_ticket_purchase_details(user_input)
+            num_tickets, event_address = self._extract_ticket_purchase_details(user_input)
             
             if not num_tickets or not event_address:
                 response = "I'm not sure how many tickets you want to purchase or for which event. Could you please clarify?"
@@ -106,7 +106,7 @@ class EventBookingAgent:
                     response = "To purchase tickets, I'll need you to connect your Ethereum wallet. Would you like to connect your wallet now?"
                 else:
                     # Proceed with ticket purchase
-                    purchase_result = await self._purchase_tickets(event_address, num_tickets)
+                    purchase_result = self._purchase_tickets(event_address, num_tickets)
                     if purchase_result.get('success'):
                         response = f"Great! I've purchased {num_tickets} ticket(s) for you. Your transaction hash is: {purchase_result.get('tx_hash')}"
                     else:
@@ -114,7 +114,7 @@ class EventBookingAgent:
         
         elif intent == "connect_wallet":
             # Logic to connect wallet (in a real scenario, this would use a wallet provider)
-            wallet_address = await self._connect_wallet(user_input)
+            wallet_address = self._connect_wallet(user_input)
             if wallet_address:
                 self.user_wallet = wallet_address
                 response = f"I've connected your wallet with address {wallet_address[:6]}...{wallet_address[-4:]}. Now we can proceed with ticket purchases."
@@ -127,7 +127,7 @@ class EventBookingAgent:
         self._add_to_history("assistant", response)
         return response
     
-    async def _determine_intent(self, user_input: str) -> str:
+    def _determine_intent(self, user_input: str) -> str:
         """Determine the user's intent from their input."""
         prompt = f"""
         Analyze the following user input and determine the intent:
@@ -145,7 +145,7 @@ class EventBookingAgent:
         Return only the intent name without any explanation.
         """
         
-        response = await self.model.generate_content(prompt)
+        response = self.model.generate_content(prompt)
         intent = response.text.strip().lower()
         
         # Normalize the intent
@@ -162,7 +162,7 @@ class EventBookingAgent:
         else:
             return "other"
     
-    async def _extract_event_details(self, user_input: str) -> Dict[str, Any]:
+    def _extract_event_details(self, user_input: str) -> Dict[str, Any]:
         """Extract event details from user input."""
         prompt = f"""
         Extract event details from the following user input:
@@ -179,7 +179,7 @@ class EventBookingAgent:
         Format the output as a JSON object with these fields. Use null for missing values.
         """
         
-        response = await self.model.generate_content(prompt)
+        response = self.model.generate_content(prompt)
         try:
             # Extract JSON from the response
             json_match = re.search(r'\{.*\}', response.text, re.DOTALL)
@@ -192,7 +192,7 @@ class EventBookingAgent:
         
     """Uncomment the second _search_events when you want to test things out"""
     
-    # async def _search_events(self, event_details: Dict[str, Any]) -> List[Dict[str, Any]]:
+    # def _search_events(self, event_details: Dict[str, Any]) -> List[Dict[str, Any]]:
     #     """Search for events matching the given criteria."""
     #     # In a real application, this would query the blockchain for events
     #     # For this example, we'll simulate fetching events from the smart contract
@@ -229,7 +229,7 @@ class EventBookingAgent:
     #         print(f"Error searching events: {e}")
     #         return []
         
-    async def _search_events(self, event_details: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def _search_events(self, event_details: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Search for events matching the given criteria using mock data."""
         from mock_data import MOCK_EVENTS
         
@@ -265,7 +265,7 @@ class EventBookingAgent:
         
         return result.strip()
     
-    async def _extract_selected_event(self, user_input: str) -> Optional[Dict[str, Any]]:
+    def _extract_selected_event(self, user_input: str) -> Optional[Dict[str, Any]]:
         """Extract which event the user selected."""
         # This would maintain context of previously shown events and match user selection
         # For this example, we'll simulate this by parsing the input for an event number or name
@@ -301,7 +301,7 @@ class EventBookingAgent:
             print(f"Error extracting selected event: {e}")
             return None
     
-    async def _get_ticket_details(self, event_address: str) -> Dict[str, Any]:
+    def _get_ticket_details(self, event_address: str) -> Dict[str, Any]:
         """Get ticket details for a specific event."""
         try:
             event_contract = web3.eth.contract(address=event_address, abi=EVENT_ABI)
@@ -317,7 +317,7 @@ class EventBookingAgent:
             print(f"Error getting ticket details: {e}")
             return {'price': 0, 'tickets_left': 0}
     
-    async def _extract_ticket_purchase_details(self, user_input: str) -> Tuple[int, str]:
+    def _extract_ticket_purchase_details(self, user_input: str) -> Tuple[int, str]:
         """Extract ticket purchase details from user input."""
         # Extract number of tickets
         num_tickets_match = re.search(r'(\d+)\s+ticket', user_input)
@@ -329,7 +329,7 @@ class EventBookingAgent:
         
         return num_tickets, event_address
     
-    async def _connect_wallet(self, user_input: str) -> Optional[str]:
+    def _connect_wallet(self, user_input: str) -> Optional[str]:
         """Connect user's Ethereum wallet."""
         # In a real implementation, this would use a wallet provider API
         # For this example, we'll extract an Ethereum address if provided
@@ -340,7 +340,7 @@ class EventBookingAgent:
             # Simulating a connected wallet
             return '0xuser123456789abcdef123456789abcdef1234567'
     
-    async def _purchase_tickets(self, event_address: str, num_tickets: int) -> Dict[str, Any]:
+    def _purchase_tickets(self, event_address: str, num_tickets: int) -> Dict[str, Any]:
         """Purchase tickets for a specific event."""
         try:
             event_contract = web3.eth.contract(address=event_address, abi=EVENT_ABI)
@@ -375,7 +375,7 @@ class EventBookingAgent:
             }
 
 # Example usage
-async def main():
+def main():
     agent = EventBookingAgent()
     
     # Simulating a conversation
@@ -383,37 +383,37 @@ async def main():
     
     # User starts conversation
     user_input = "Hi, I'm looking for concert tickets"
-    response = await agent.chat(user_input)
+    response = agent.chat(user_input)
     responses.append(("User", user_input))
     responses.append(("Agent", response))
     
     # User provides more details
     user_input = "I want to book tickets for the Taylor Swift concert next weekend"
-    response = await agent.chat(user_input)
+    response = agent.chat(user_input)
     responses.append(("User", user_input))
     responses.append(("Agent", response))
     
     # User selects an event
     user_input = "I'd like to book event number 2"
-    response = await agent.chat(user_input)
+    response = agent.chat(user_input)
     responses.append(("User", user_input))
     responses.append(("Agent", response))
     
     # User specifies number of tickets
     user_input = "I want to buy 3 tickets"
-    response = await agent.chat(user_input)
+    response = agent.chat(user_input)
     responses.append(("User", user_input))
     responses.append(("Agent", response))
     
     # User connects wallet
     user_input = "Yes, connect my wallet 0x742d35Cc6634C0532925a3b844Bc454e4438f44e"
-    response = await agent.chat(user_input)
+    response = agent.chat(user_input)
     responses.append(("User", user_input))
     responses.append(("Agent", response))
     
     # User confirms purchase
     user_input = "Yes, complete the purchase of 3 tickets"
-    response = await agent.chat(user_input)
+    response = agent.chat(user_input)
     responses.append(("User", user_input))
     responses.append(("Agent", response))
     
@@ -422,5 +422,5 @@ async def main():
         print(f"{role}: {message}\n")
 
 if __name__ == "__main__":
-    import asyncio
-    asyncio.run(main())
+    import o
+    o.run(main())

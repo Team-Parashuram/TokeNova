@@ -14,6 +14,10 @@ EVENT_CREATOR_ADDRESS=0xYourDeployedEventCreatorContractAddress
 # Tests
 To run tests
 ```
+npm install -g ganache-cli
+ganache-cli
+```
 python test_agent.py
 ```
+
 

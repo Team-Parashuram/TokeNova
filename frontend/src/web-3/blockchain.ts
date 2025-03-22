@@ -1,14 +1,17 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ethers } from "ethers";
+import { useAccount } from 'wagmi';
 
 import EventCreatorABI from "@/../../web3-contracts/artifacts/contracts/EventCreator.sol/EventCreator.json";
 import EventABI from "@/../../web3-contracts/artifacts/contracts/Event.sol/Event.json";
 import UserABI from "@/../../web3-contracts/artifacts/contracts/User.sol/User.json";
+import AppABI from "@/../../web3-contracts/artifacts/contracts/App.sol/App.json";
 
-const EVENT_CREATOR_ADDRESS = process.env.EVENT_CREATOR_ADDRESS;
-const USER_CONTRACT_ADDRESS = process.env.USER_CONTRACT_ADDRESS;
 
-if (!EVENT_CREATOR_ADDRESS || !USER_CONTRACT_ADDRESS) {
+const APP_CONTRACT_ADDRESS = process.env.APP_CONTRACT_ADDRESS;
+
+if (!APP_CONTRACT_ADDRESS) {
   throw new Error("Missing environment variables for contract addresses");
 }
 
@@ -20,6 +23,58 @@ const signer = await provider.getSigner(0); // 0 is the first Hardhat account
 //   return signer;
 // };
 
+// App Contract endpoints
+export const registerUser = async (signer: ethers.Signer) => {
+  const contract = new ethers.Contract(APP_CONTRACT_ADDRESS, AppABI.abi, signer);
+
+  try {
+    const tx = await contract.registerUser();
+    await tx.wait(); // Wait for confirmation
+    console.log("User registered successfully!");
+  } catch (error) {
+    console.error("Registration failed:", error);
+  }
+};
+
+export const registerCreator = async (eventContract: string) => {
+  const contract = new ethers.Contract(APP_CONTRACT_ADDRESS, AppABI.abi, signer);
+
+  try {
+    const tx = await contract.registerCreator(eventContract);
+    await tx.wait(); // Wait for transaction confirmation
+    console.log(" Event creator registered successfully:", tx.hash);
+  } catch (error) {
+    console.error(" Error registering event creator:", error);
+    throw new Error("Failed to register event creator");
+  } 
+};
+
+export const isUserRegistered = async (userAddress: string): Promise<boolean> => {
+  const contract = new ethers.Contract(APP_CONTRACT_ADDRESS, AppABI.abi, signer);
+
+  try {
+    const isRegistered = await contract.isUserRegistered(userAddress);
+    console.log(`User ${userAddress} is registered:`, isRegistered);
+    return isRegistered;
+  } catch (error) {
+    console.error(" Error checking user registration:", error);
+    throw new Error("Failed to check user registration");
+  }
+};
+
+export const isCreatorRegistered = async (creatorAddress: string): Promise<boolean> => {
+  const contract = new ethers.Contract(APP_CONTRACT_ADDRESS, AppABI.abi, signer);
+
+  try {
+    const isRegistered = await contract.isCreatorRegistered(creatorAddress);
+    console.log(`Creator ${creatorAddress} is registered:`, isRegistered);
+    return isRegistered;
+  } catch (error) {
+    console.error(" Error checking creator registration:", error);
+    throw new Error("Failed to check creator registration");
+  }
+};
+
 //EventCreator
 export const createEvent = async (
   numTickets: number,
@@ -29,45 +84,64 @@ export const createEvent = async (
   eventName: string,
   eventSymbol: string
 ) => {
-  // const signer = await getSigner();
+  const userAddress = useAccount();
 
-  const eventCreatorContract = new ethers.Contract(
-    EVENT_CREATOR_ADDRESS,
-    EventCreatorABI.abi,
-    signer
-  );
+  // Fetch the event creator contract assigned to the user from the App contract
+  const appContract = new ethers.Contract(APP_CONTRACT_ADDRESS, AppABI.abi, provider);
+  
+  try {
+    const creatorProfile = await appContract.creators(userAddress);
+    const eventCreatorAddress = creatorProfile.eventContract;
 
-  const tx = await eventCreatorContract.createEvent(
-    numTickets,
-    price,
-    canBeResold,
-    royaltyPercent,
-    eventName,
-    eventSymbol,
-    USER_CONTRACT_ADDRESS
-  );
+    if (!eventCreatorAddress) {
+      throw new Error("No EventCreator contract assigned to user");
+    }
 
-  await tx.wait();
-  console.log("Event created successfully:", tx.hash);
+    // Use the user's mapped event creator contract
+    const eventCreatorContract = new ethers.Contract(eventCreatorAddress, EventCreatorABI.abi, signer);
+
+    const tx = await eventCreatorContract.createEvent(
+      numTickets,
+      price,
+      canBeResold,
+      royaltyPercent,
+      eventName,
+      eventSymbol,
+      APP_CONTRACT_ADDRESS
+    );
+
+    await tx.wait(); // Wait for confirmation
+    console.log(" Event created successfully:", tx.hash);
+  } catch (error) {
+    console.error(" Error creating event:", error);
+    throw new Error("Failed to create event");
+  }
 };
 
-export const getEvents = async (): Promise<string[]> => {
-  if (!EVENT_CREATOR_ADDRESS) {
-    throw new Error("Missing environment variable: EVENT_CREATOR_ADDRESS");
-  }
+export const getEvents = async () => {
+  const userAddress = useAccount();
 
-  const eventCreatorContract = new ethers.Contract(
-    EVENT_CREATOR_ADDRESS,
-    EventCreatorABI.abi,
-    provider 
-  );
-
+  // Fetch the event creator contract assigned to the user from the App contract
+  const appContract = new ethers.Contract(APP_CONTRACT_ADDRESS, AppABI.abi, provider);
+  
   try {
-    const eventAddresses: string[] = await eventCreatorContract.getEvents();
-    console.log("Fetched Events:", eventAddresses);
-    return eventAddresses;
+    const creatorProfile = await appContract.creators(userAddress);
+    const eventCreatorAddress = creatorProfile.eventContract;
+
+    if (!eventCreatorAddress) {
+      throw new Error("No EventCreator contract assigned to user");
+    }
+
+    // Use the user's mapped event creator contract
+    const eventCreatorContract = new ethers.Contract(eventCreatorAddress, EventCreatorABI.abi, provider);
+
+    // Fetch events
+    const events = await eventCreatorContract.getEvents();
+    console.log(" Retrieved events:", events);
+
+    return events;
   } catch (error) {
-    console.error("Error fetching events:", error);
+    console.error(" Error fetching events:", error);
     throw new Error("Failed to fetch events");
   }
 };
@@ -253,7 +327,6 @@ export const getEventDetails = async (eventAddress: string) => {
   }
 };
 
-
 //User
 export const addUserTicket = async (
   userAddress: string,
@@ -285,7 +358,7 @@ export const getUserTickets = async (userAddress: string, userContractAddress: s
     throw new Error("User address is required");
   }
 
-  const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545"); // Update with actual provider
+  const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
   const userContract = new ethers.Contract(userContractAddress, UserABI.abi, provider);
 
   try {
@@ -300,4 +373,3 @@ export const getUserTickets = async (userAddress: string, userContractAddress: s
     throw new Error("Failed to fetch tickets");
   }
 };
-

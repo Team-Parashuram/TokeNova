@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import EventCard from "../components/Events/EventCard"
+import { motion, AnimatePresence } from 'framer-motion';
+import EventCard from "../components/Events/EventCard";
 
 interface Event {
     id: string;
@@ -14,106 +15,222 @@ interface Event {
     organizer: string;
     category: string;
 }
+import { v1 as uuidv1 } from 'uuid';
+import { useAccount } from 'wagmi';
+import { useUserStore } from '@/store/store';
 
 const HomePage = () => {
     const [events, setEvents] = useState<Event[]>([]);
     const [loading, setLoading] = useState(true);
     const [categories, setCategories] = useState<string[]>([]);
     const [selectedCategory, setSelectedCategory] = useState('All');
-
+    const [searchTerm, setSearchTerm] = useState('');
+    const { address } = useAccount();
+    const userId = useUserStore(state => state.user?.id);
+    const setUser = useUserStore(state => state.setUser);
     useEffect(() => {
-        // Replace with your actual data fetching logic
-        const fetchEvents = async () => {
-        try {
-            // Mock data for demonstration
-            const mockEvents: Event[] = [
-            {
-                id: '1',
-                name: 'Ethereum Developer Conference',
-                description: 'Join us for the biggest Ethereum developer event of the year.',
-                date: '2025-04-15',
-                location: 'Virtual',
-                price: '0.1',
-                ticketsAvailable: 350,
-                totalTickets: 500,
-                imageUrl: 'https://via.placeholder.com/500',
-                organizer: '0x1234...5678',
-                category: 'Tech'
-            },
-            {
-                id: '2',
-                name: 'NFT Art Exhibition',
-                description: 'Exclusive exhibition featuring works from top NFT artists.',
-                date: '2025-04-22',
-                location: 'New York, NY',
-                price: '0.05',
-                ticketsAvailable: 120,
-                totalTickets: 150,
-                imageUrl: 'https://via.placeholder.com/500',
-                organizer: '0xabcd...efgh',
-                category: 'Art'
-            },
-            // Add more mock events as needed
-            ];
-            
-            setEvents(mockEvents);
-            
-            // Extract unique categories
-            const uniqueCategories = ['All', ...new Set(mockEvents.map(event => event.category))];
-            setCategories(uniqueCategories);
-            
-            setLoading(false);
-        } catch (error) {
-            console.error('Error fetching events:', error);
-            setLoading(false);
+        if (address && !userId) {
+            const newId = uuidv1();
+            setUser({ id: newId });
         }
+    }, [address, userId, setUser]);
+    useEffect(() => {
+        const fetchEvents = async () => {
+            try {
+                // Mock data for demonstration
+                const mockEvents: Event[] = [
+                    {
+                        id: '1',
+                        name: 'Ethereum Developer Conference',
+                        description: 'Join us for the biggest Ethereum developer event of the year.',
+                        date: '2025-04-15',
+                        location: 'Virtual',
+                        price: '0.1',
+                        ticketsAvailable: 350,
+                        totalTickets: 500,
+                        imageUrl: 'https://via.placeholder.com/500',
+                        organizer: '0x1234...5678',
+                        category: 'Tech'
+                    },
+                    {
+                        id: '2',
+                        name: 'NFT Art Exhibition',
+                        description: 'Exclusive exhibition featuring works from top NFT artists.',
+                        date: '2025-04-22',
+                        location: 'New York, NY',
+                        price: '0.05',
+                        ticketsAvailable: 120,
+                        totalTickets: 150,
+                        imageUrl: 'https://via.placeholder.com/500',
+                        organizer: '0xabcd...efgh',
+                        category: 'Art'
+                    },
+                    // Add more mock events as needed
+                ];
+                
+                setEvents(mockEvents);
+                const uniqueCategories = ['All', ...new Set(mockEvents.map(event => event.category))];
+                setCategories(uniqueCategories);
+                setLoading(false);
+            } catch (error) {
+                console.error('Error fetching events:', error);
+                setLoading(false);
+            }
         };
 
         fetchEvents();
     }, []);
 
-    const filteredEvents = selectedCategory === 'All' 
-        ? events 
-        : events.filter(event => event.category === selectedCategory);
+    // Filter events by both category and search term
+    const displayEvents = events
+        .filter(event => selectedCategory === 'All' || event.category === selectedCategory)
+        .filter(event => 
+            event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            event.description.toLowerCase().includes(searchTerm.toLowerCase())
+        );
 
     return (
-        <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-4">Discover Events</h1>
-            <div className="flex space-x-4 overflow-x-auto pb-2">
-            {categories.map(category => (
-                <button
-                key={category}
-                className={`px-4 py-2 rounded-full ${
-                    selectedCategory === category
-                    ? 'bg-purple-700 text-white'
-                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                }`}
-                onClick={() => setSelectedCategory(category)}
-                >
-                {category}
-                </button>
-            ))}
+        <div className="min-h-screen bg-white">
+            {/* Background Elements */}
+            <div className="fixed inset-0 -z-10 opacity-5">
+                <div className="absolute top-0 left-0 w-full h-full bg-grid-pattern" />
             </div>
-        </div>
+            
+            {/* Floating Elements */}
+            <div className="fixed inset-0 -z-5 overflow-hidden">
+                <motion.div 
+                    className="absolute w-64 h-64 rounded-full bg-purple-300 blur-3xl"
+                    animate={{ x: [0, 100, 0], y: [0, 50, 0] }}
+                    transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+                    style={{ top: '10%', left: '5%', opacity: 0.2 }}
+                />
+                <motion.div 
+                    className="absolute w-80 h-80 rounded-full bg-indigo-400 blur-3xl"
+                    animate={{ x: [0, -70, 0], y: [0, 100, 0] }}
+                    transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+                    style={{ top: '40%', right: '10%', opacity: 0.15 }}
+                />
+            </div>
 
-        {loading ? (
-            <div className="flex justify-center items-center h-64">
-            <p className="text-gray-500">Loading events...</p>
+            <div className="container mx-auto px-6 py-24">
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.7 }}
+                    className="text-center mb-16"
+                >
+                    <h1 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900">
+                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+                            Discover Events
+                        </span>
+                    </h1>
+                    <p className="text-gray-600 max-w-2xl mx-auto text-lg">
+                        Explore and participate in events secured by blockchain technology
+                    </p>
+                </motion.div>
+
+                {/* Improved Search Bar */}
+                <div className="max-w-xl mx-auto mb-8">
+                    <div className="relative">
+                        <input
+                            placeholder="Search events..."
+                            className="w-full px-4 py-2 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-300 shadow-sm pl-10 pr-10"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <svg 
+                            className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            viewBox="0 0 24 24"
+                        >
+                            <path 
+                                strokeLinecap="round" 
+                                strokeLinejoin="round" 
+                                strokeWidth="2" 
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
+                            />
+                        </svg>
+                        {searchTerm && (
+                            <button
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                onClick={() => setSearchTerm('')}
+                            >
+                                <svg 
+                                    className="w-5 h-5" 
+                                    fill="none" 
+                                    stroke="currentColor" 
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path 
+                                        strokeLinecap="round" 
+                                        strokeLinejoin="round" 
+                                        strokeWidth="2" 
+                                        d="M6 18L18 6M6 6l12 12" 
+                                    />
+                                </svg>
+                            </button>
+                        )}
+                    </div>
+                </div>
+
+                <div className="flex flex-wrap justify-center gap-3 mb-12">
+                    {categories.map(category => (
+                        <motion.button
+                            key={category}
+                            onClick={() => setSelectedCategory(category)}
+                            className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                                selectedCategory === category
+                                ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-md'
+                                : 'bg-white border border-gray-200 text-gray-700 hover:border-indigo-300 hover:shadow-sm'
+                            }`}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.98 }}
+                        >
+                            {category}
+                        </motion.button>
+                    ))}
+                </div>
+
+                {loading ? (
+                    <div className="flex justify-center items-center h-64">
+                        <div className="w-16 h-16 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+                        <p className="ml-4 text-gray-600 font-medium">Loading events...</p>
+                    </div>
+                ) : displayEvents.length > 0 ? (
+                    <AnimatePresence>
+                        <motion.div 
+                            className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ staggerChildren: 0.1 }}
+                        >
+                            {displayEvents.map((event, index) => (
+                                <motion.div
+                                    key={event.id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                                >
+                                    <EventCard event={event} />
+                                </motion.div>
+                            ))}
+                        </motion.div>
+                    </AnimatePresence>
+                ) : (
+                    <motion.div 
+                        className="text-center py-16 bg-gray-50 rounded-xl"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                    >
+                        <div className="text-gray-500 text-lg">
+                            No events found.
+                        </div>
+                    </motion.div>
+                )}
             </div>
-        ) : filteredEvents.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredEvents.map(event => (
-                <EventCard key={event.id} event={event} />
-            ))}
-            </div>
-        ) : (
-            <div className="text-center py-12">
-            <p className="text-gray-500">No events found in this category.</p>
-            </div>
-        )}
         </div>
     );
-    };
+};
 
 export default HomePage;

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { ConnectKitButton } from 'connectkit';
 import { useAccount } from 'wagmi';
 import { motion} from 'framer-motion';
+import ChatWithAI from './ChatSystem/ChatWithAI';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -44,7 +45,6 @@ const Header = () => {
         }`}
       >
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          {/* Logo */}
           <div 
             className="flex items-center gap-2 cursor-pointer" 
             onClick={() => navigateTo('/')}
@@ -63,13 +63,12 @@ const Header = () => {
                 </div>
           </div>
 
-          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             <a 
               onClick={() => navigateTo('/home')} 
               className="text-black hover:text-purple-400 transition cursor-pointer"
             >
-              Explore
+              Explores
             </a>
             {address && (
               <>
@@ -92,7 +91,6 @@ const Header = () => {
             </a>
           </nav>
 
-          {/* Connect Wallet Button */}
           <div className="flex items-center gap-4">
             <ConnectKitButton 
               customTheme={{
@@ -102,8 +100,11 @@ const Header = () => {
                 "--ck-connectbutton-border-radius": "9999px",
               }}
             />
-
-            {/* Mobile Menu Button */}
+            <div
+              className='pl-15'
+            >
+              <ChatWithAI />
+            </div>
             <button 
               className="md:hidden text-black focus:outline-none"
               onClick={toggleMobileMenu}
@@ -170,7 +171,6 @@ const Header = () => {
           </div>
         )}
       </header>
-      
       {/* Spacer for fixed header */}
       <div className="h-16"></div>
     </>

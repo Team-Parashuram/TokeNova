@@ -1,7 +1,6 @@
-import asyncio
 from event_booking_agent import EventBookingAgent
 
-async def test_conversation():
+def test_conversation():
     agent = EventBookingAgent()
     
     # Test conversation flow
@@ -16,11 +15,8 @@ async def test_conversation():
     
     for user_input in test_inputs:
         print(f"\nUser: {user_input}")
-        response = await agent.chat(user_input)
+        response = agent.chat(user_input)
         print(f"Agent: {response}")
-        
-        # Add a small delay to make the conversation easier to follow
-        await asyncio.sleep(1)
 
 if __name__ == "__main__":
-    asyncio.run(test_conversation())
+    test_conversation()
