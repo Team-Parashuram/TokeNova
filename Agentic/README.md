@@ -1,0 +1,19 @@
+# Store this in .env file
+
+# API Keys
+GEMINI_API_KEY=your_gemini_api_key_here
+
+# Blockchain Configuration
+WEB3_PROVIDER_URI=https://mainnet.infura.io/v3/your_infura_project_id
+# For testing, you can use a local blockchain:
+# WEB3_PROVIDER_URI=http://localhost:8545
+
+# Contract Addresses
+EVENT_CREATOR_ADDRESS=0xYourDeployedEventCreatorContractAddress
+
+# Tests
+To run tests
+```
+python test_agent.py
+```
+

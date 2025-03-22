@@ -1,7 +1,7 @@
 import cors from 'cors';
 import morgan from 'morgan';
 import express from 'express';
-import { Connect } from './database/connect.database.ts';
+import { Connect } from './database/connect.database';
 
 const app = express();
 

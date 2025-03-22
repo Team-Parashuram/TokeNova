@@ -13,9 +13,9 @@ type SEOProps = {
 
 const Meta: FC<SEOProps> = ({
   author = 'Team ParshuRam',
-  title = 'HostHive | An Event Management Platform',
+  title = 'Tokenova | An Event Management Platform',
   keywords = 'event management, smart event booking, digital check-ins, live entry tracking, real-time feedback, event feedback system, event engagement, conference feedback, Web3 ticketing, NFT event tickets, secure ticketing, anti-scalping tickets, blockchain event management',
-  description = 'HostHive is an innovative event management platform designed for seamless event booking, digital check-ins, and real-time attendee tracking. Enhance engagement with live feedback features and ensure ticket security with NFT-based ticketing, reducing scalping and counterfeiting risks.',
+  description = 'Tokenova is an innovative event management platform designed for seamless event booking, digital check-ins, and real-time attendee tracking. Enhance engagement with live feedback features and ensure ticket security with NFT-based ticketing, reducing scalping and counterfeiting risks.',
 }) => (
   <Helmet>
     <html lang="en" />
