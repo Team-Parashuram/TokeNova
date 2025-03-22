@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAccount } from 'wagmi';
 import { motion } from 'framer-motion';
 import axios from 'axios';
+import { createEvent } from '@/web-3/blockchain'; // Adjust the import path as necessary
 
 const CreateEvent = () => {
     const { address } = useAccount();
@@ -20,19 +21,22 @@ const CreateEvent = () => {
         totalTickets: 100,
         category: '',
         imageUrl: '',
+        canBeResold: false, // Added for blockchain integration
+        royaltyPercent: 0,  // Added for blockchain integration
     });
     const [error, setError] = useState<string | null>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        const { name, value, type } = e.target;
+        const newValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
+        setFormData((prev) => ({ ...prev, [name]: newValue }));
     };
 
     const handleAIGenerate = async () => {
         if (!aiPrompt) return;
         setLoading(true);
         setError(null);
-    
+
         try {
             const response = await axios.post(
                 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=' + geminiApiKey,
@@ -53,10 +57,10 @@ const CreateEvent = () => {
                     }
                 }
             );
-    
+
             const generatedText = response.data.candidates[0].content.parts[0].text;
-            console.log('Generated text:', generatedText); 
-    
+            console.log('Generated text:', generatedText);
+
             let jsonString;
             if (generatedText.startsWith('{') && generatedText.endsWith('}')) {
                 jsonString = generatedText;
@@ -68,24 +72,21 @@ const CreateEvent = () => {
                     throw new Error('Invalid response format');
                 }
             }
-    
-            try {
-                const generatedData = JSON.parse(jsonString);
-                setFormData((prev) => ({
-                    ...prev,
-                    name: generatedData.name || '',
-                    description: generatedData.description || '',
-                    category: generatedData.category || 'Other',
-                    date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                    location: 'Virtual',
-                    price: '0.05',
-                    totalTickets: 100,
-                    imageUrl: 'https://via.placeholder.com/500',
-                }));
-            } catch (parseError) {
-                console.error('Error parsing JSON:', parseError);
-                setError('Failed to parse generated event details.');
-            }
+
+            const generatedData = JSON.parse(jsonString);
+            setFormData((prev) => ({
+                ...prev,
+                name: generatedData.name || '',
+                description: generatedData.description || '',
+                category: generatedData.category || 'Other',
+                date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                location: 'Virtual',
+                price: '0.05',
+                totalTickets: 100,
+                imageUrl: 'https://via.placeholder.com/500',
+                canBeResold: true,
+                royaltyPercent: 10,
+            }));
         } catch (err) {
             console.error('Error generating event details:', err);
             setError('Failed to generate event details. Please try again.');
@@ -101,15 +102,43 @@ const CreateEvent = () => {
             return;
         }
         setLoading(true);
+        setError(null);
+
         try {
-            console.log('Creating event:', { ...formData, organizer: address });
-            setTimeout(() => {
-                alert('Event created successfully!');
-                navigate('/my-events');
-                setLoading(false);
-            }, 2000);
+            const { name, totalTickets, price, canBeResold, royaltyPercent } = formData;
+
+            // Parse and validate inputs
+            const numTickets = parseInt(totalTickets.toString(), 10);
+            const ticketPrice = parseFloat(price);
+            const royalty = parseInt(royaltyPercent.toString(), 10);
+
+            if (isNaN(numTickets) || numTickets <= 0) {
+                throw new Error('Total tickets must be a positive number');
+            }
+            if (isNaN(ticketPrice) || ticketPrice <= 0) {
+                throw new Error('Price must be a positive number');
+            }
+            if (isNaN(royalty) || royalty < 0 || royalty > 100) {
+                throw new Error('Royalty percent must be between 0 and 100');
+            }
+
+            // Call the blockchain function
+            await createEvent(
+                address,
+                numTickets,
+                ticketPrice,
+                canBeResold,
+                royalty,
+                name,
+                name.substring(0, 3).toUpperCase()
+            );
+
+            alert('Event created successfully on the blockchain!');
+            navigate('/my-events');
         } catch (error) {
             console.error('Error creating event:', error);
+            setError('Failed to create event on the blockchain. Please try again.');
+        } finally {
             setLoading(false);
         }
     };
@@ -122,13 +151,13 @@ const CreateEvent = () => {
             </div>
             {/* Floating Blobs */}
             <div className="fixed inset-0 -z-5 overflow-hidden">
-                <motion.div 
+                <motion.div
                     className="absolute w-64 h-64 rounded-full bg-purple-300 blur-3xl"
                     animate={{ x: [0, 100, 0], y: [0, 50, 0] }}
                     transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
                     style={{ top: '10%', left: '5%', opacity: 0.2 }}
                 />
-                <motion.div 
+                <motion.div
                     className="absolute w-80 h-80 rounded-full bg-indigo-400 blur-3xl"
                     animate={{ x: [0, -70, 0], y: [0, 100, 0] }}
                     transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
@@ -338,6 +367,32 @@ const CreateEvent = () => {
                                 />
                             </div>
 
+                            <div>
+                                <label className="block text-gray-700 font-medium mb-2">Can Be Resold</label>
+                                <input
+                                    type="checkbox"
+                                    name="canBeResold"
+                                    checked={formData.canBeResold}
+                                    onChange={handleChange}
+                                    className="form-checkbox h-5 w-5 text-indigo-600"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-gray-700 font-medium mb-2">Royalty Percent</label>
+                                <input
+                                    type="number"
+                                    name="royaltyPercent"
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 hover:border-indigo-300 transition-colors duration-300"
+                                    placeholder="10"
+                                    value={formData.royaltyPercent}
+                                    onChange={handleChange}
+                                    min="0"
+                                    max="100"
+                                    required
+                                />
+                            </div>
+
                             <div className="md:col-span-2">
                                 <button
                                     type="submit"
@@ -356,6 +411,7 @@ const CreateEvent = () => {
                                 </button>
                             </div>
                         </div>
+                        {error && <p className="text-red-500 mt-4 text-center">{error}</p>}
                     </form>
                 </motion.div>
             </div>

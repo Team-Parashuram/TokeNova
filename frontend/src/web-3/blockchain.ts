@@ -73,6 +73,7 @@ export const isCreatorRegistered = async (creatorAddress: string): Promise<boole
 
 //EventCreator
 export const createEvent = async (
+  userAddress: string, // Add this parameter
   numTickets: number,
   price: number,
   canBeResold: boolean,
@@ -80,11 +81,9 @@ export const createEvent = async (
   eventName: string,
   eventSymbol: string
 ) => {
-  const userAddress = useAccount();
-
   // Fetch the event creator contract assigned to the user from the App contract
   const appContract = new ethers.Contract(APP_CONTRACT_ADDRESS, AppABI.abi, provider);
-  
+
   try {
     const creatorProfile = await appContract.creators(userAddress);
     const eventCreatorAddress = creatorProfile.eventContract;
@@ -106,14 +105,13 @@ export const createEvent = async (
       APP_CONTRACT_ADDRESS
     );
 
-    await tx.wait(); 
-    console.log(" Event created successfully:", tx.hash);
+    await tx.wait();
+    console.log("Event created successfully:", tx.hash);
   } catch (error) {
-    console.error(" Error creating event:", error);
+    console.error("Error creating event:", error);
     throw new Error("Failed to create event");
   }
 };
-
 export const getAllEvents = async () => {
   const appContract = new ethers.Contract(APP_CONTRACT_ADDRESS, AppABI.abi, provider);
   try {
