@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ConnectKitButton } from 'connectkit';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getAllEvents } from '@/web-3/blockchain';
 
 const LandingPage = () => {
     const [scrollY, setScrollY] = useState(0);

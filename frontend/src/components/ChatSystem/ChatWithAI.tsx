@@ -1,76 +1,83 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { MessageCircleCodeIcon, X, Send } from "lucide-react"
-import { useState, useEffect, useRef } from "react"
-import { events_array } from "../Dummy/EventLink"
-import { dummyMessages } from "../Dummy/Chat"
-import { Event } from "../Types/Event.Types"
+import { MessageCircleCodeIcon, X, Send } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { dummyMessages } from "../Dummy/Chat";
+import { useBalance, useAccount } from "wagmi";
+import { Event } from "../Types/Event.Types";
+import { getAllEvents } from "@/web-3/blockchain";
+import axios from "axios";
+import { useUserStore } from "@/store/store";
 
 const ChatWithAI = () => {
-  const [open, setOpen] = useState(false)
-  const [messages, setMessages] = useState(dummyMessages)
-  const [inputValue, setInputValue] = useState("")
-  const messagesContainerRef = useRef<HTMLDivElement>(null)
-  
+  const user = useUserStore((state) => state.user);
+  const [open, setOpen] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+  const [messages, setMessages] = useState(dummyMessages);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+
   const [allEvents, setAllEvents] = useState<Event[]>([]);
-  setAllEvents(events_array)
-  // This will be in use effect for ai backend
+  useEffect(() => {
+    async function getData() {
+      const events = await getAllEvents();
+      if (Array.isArray(events)) setAllEvents(events);
+    }
+    getData();
+  }, []);
+
+  const account = useAccount();
+
+  const balance = useBalance({
+    address: account.address
+  });
+
 
   useEffect(() => {
     if (open) {
-      document.body.style.overflow = 'hidden'
-      // sendMessageToAI(allEvents)
+      document.body.style.overflow = "hidden";
+
+      const URL = import.meta.env.VITE_URL;
+      const res = axios.post(URL,{
+        "userId": user?.id, 
+        "balance": balance
+      })
     } else {
-      document.body.style.overflow = 'auto'
+      document.body.style.overflow = "auto";
     }
 
     return () => {
-      document.body.style.overflow = 'auto'
-    }
-  }, [open])
-  
+      document.body.style.overflow = "auto";
+    };
+  }, [open]);
+
   useEffect(() => {
     if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight
+      messagesContainerRef.current.scrollTop =
+        messagesContainerRef.current.scrollHeight;
     }
-  }, [messages])
-  
+  }, [messages]);
+
   const toggleSidebar = () => {
-    setOpen(!open)
-  }
+    setOpen(!open);
+  };
 
   const handleSend = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
     if (inputValue.trim()) {
       const newMessage = {
         text: inputValue,
         sender: "user",
-        timestamp: new Date().toISOString()
-      }
-      
-      setMessages([...messages, newMessage])
-      setInputValue("")
-    }
-  }
+        timestamp: new Date().toISOString(),
+      };
 
-  // This will come from an AI so mind that and thuse we can store that in array and in chat 
-  const handleRecive = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (inputValue.trim()) {
-      const newMessage = {
-        text: inputValue,
-        sender: "ai",
-        timestamp: new Date().toISOString()
-      }
-      
-      setMessages([...messages, newMessage])
+      setMessages([...messages, newMessage]);
       setInputValue("");
     }
-  }
+  };
 
   return (
     <div className="relative">
       {/* This is the simplpe Button  */}
-      <div 
+      <div
         className="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md bg-purple-50 text-purple-700 hover:bg-purple-100 transition-colors cursor-pointer"
         onClick={toggleSidebar}
       >
@@ -81,7 +88,7 @@ const ChatWithAI = () => {
       {/* This is when the sidebar is open */}
       {open && (
         <div className="fixed inset-0 z-50" onClick={toggleSidebar}>
-          <div 
+          <div
             className="fixed top-0 right-0 h-full w-96 md:w-1/3 lg:w-2/5 bg-white shadow-lg z-50 transition-all duration-300 ease-in-out"
             onClick={(e) => e.stopPropagation()}
           >
@@ -89,7 +96,7 @@ const ChatWithAI = () => {
               <div className="p-4 border-b">
                 <div className="flex justify-between items-center">
                   <h3 className="font-medium text-xl">AI Assistant</h3>
-                  <button 
+                  <button
                     onClick={toggleSidebar}
                     className="p-1 rounded-full hover:bg-gray-100"
                   >
@@ -97,25 +104,31 @@ const ChatWithAI = () => {
                   </button>
                 </div>
               </div>
-              
+
               {/* This saves all the messages that have happened yet */}
-              <div 
-                ref={messagesContainerRef} 
+              <div
+                ref={messagesContainerRef}
                 className="flex-1 overflow-y-auto p-4 space-y-4"
               >
                 {messages.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8">Start a conversation with the AI assistant</p>
+                  <p className="text-gray-500 text-center py-8">
+                    Start a conversation with the AI assistant
+                  </p>
                 ) : (
                   messages.map((message, index) => (
-                    <div 
-                      key={index} 
-                      className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                    <div
+                      key={index}
+                      className={`flex ${
+                        message.sender === "user"
+                          ? "justify-end"
+                          : "justify-start"
+                      }`}
                     >
-                      <div 
+                      <div
                         className={`max-w-3/4 p-3 rounded-lg ${
-                          message.sender === 'user' 
-                            ? 'bg-purple-100 text-purple-900' 
-                            : 'bg-gray-100 text-gray-800'
+                          message.sender === "user"
+                            ? "bg-purple-100 text-purple-900"
+                            : "bg-gray-100 text-gray-800"
                         }`}
                       >
                         {message.text}
@@ -135,7 +148,7 @@ const ChatWithAI = () => {
                     placeholder="Type your message..."
                     className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400"
                   />
-                  <button 
+                  <button
                     type="submit"
                     className="p-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-400"
                   >
@@ -148,7 +161,7 @@ const ChatWithAI = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
 export default ChatWithAI;

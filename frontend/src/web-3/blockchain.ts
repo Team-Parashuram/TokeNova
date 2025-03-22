@@ -8,20 +8,15 @@ import EventABI from "@/../../web3-contracts/artifacts/contracts/Event.sol/Event
 import UserABI from "@/../../web3-contracts/artifacts/contracts/User.sol/User.json";
 import AppABI from "@/../../web3-contracts/artifacts/contracts/App.sol/App.json";
 
-
-const APP_CONTRACT_ADDRESS = process.env.APP_CONTRACT_ADDRESS;
+const APP_CONTRACT_ADDRESS = import.meta.env.VITE_APP_CONTRACT_ADDRESS;
+const RPC_URL = import.meta.env.VITE_RPC_URL;
 
 if (!APP_CONTRACT_ADDRESS) {
   throw new Error("Missing environment variables for contract addresses");
 }
 
-const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
+const provider = new ethers.JsonRpcProvider(RPC_URL);
 const signer = await provider.getSigner(0); // 0 is the first Hardhat account
-
-// const getSigner = async () => {
-//   const signer = await provider.getSigner();
-//   return signer;
-// };
 
 // App Contract endpoints
 export const registerUser = async (signer: ethers.Signer) => {
@@ -118,28 +113,27 @@ export const createEvent = async (
   }
 };
 
-export const getEvents = async () => {
-  const userAddress = useAccount();
-
+export const getAllEvents = async () => {
   // Fetch the event creator contract assigned to the user from the App contract
   const appContract = new ethers.Contract(APP_CONTRACT_ADDRESS, AppABI.abi, provider);
   
   try {
-    const creatorProfile = await appContract.creators(userAddress);
-    const eventCreatorAddress = creatorProfile.eventContract;
-
-    if (!eventCreatorAddress) {
-      throw new Error("No EventCreator contract assigned to user");
+    const creatorProfiles = await appContract.getAllCreators();
+    
+    if (creatorProfiles.length == 0) {
+      throw new Error("No Event Creators exist");
     }
 
-    // Use the user's mapped event creator contract
-    const eventCreatorContract = new ethers.Contract(eventCreatorAddress, EventCreatorABI.abi, provider);
-
-    // Fetch events
-    const events = await eventCreatorContract.getEvents();
-    console.log(" Retrieved events:", events);
-
-    return events;
+    creatorProfiles(async (creator: { eventContract: string }) => {
+      const eventCreatorAddress = creator.eventContract;
+      const eventCreatorContract = new ethers.Contract(eventCreatorAddress, EventCreatorABI.abi, provider);
+  
+      const events = await eventCreatorContract.getEvents();
+      console.log(" Retrieved events:", events);
+  
+      return events;
+    })
+    
   } catch (error) {
     console.error(" Error fetching events:", error);
     throw new Error("Failed to fetch events");

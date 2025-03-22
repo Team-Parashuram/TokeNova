@@ -19,8 +19,8 @@ contract App {
     mapping(address => UserProfile) public users;
     mapping(address => CreatorProfile) public creators;
 
-    uint public totalUsers;
-    uint public totalCreators;
+    address[] public userList;
+    address[] public creatorList;
 
     event UserRegistered(address indexed user);
     event CreatorRegistered(address indexed creator, address eventContract);
@@ -32,7 +32,7 @@ contract App {
         require(!users[msg.sender].isRegistered, "User already registered");
 
         users[msg.sender] = UserProfile(msg.sender, true);
-        totalUsers++;
+        userList.push(msg.sender);
 
         emit UserRegistered(msg.sender);
     }
@@ -44,9 +44,23 @@ contract App {
         require(!creators[msg.sender].isRegistered, "Creator already registered");
 
         creators[msg.sender] = CreatorProfile(msg.sender, true, eventContract);
-        totalCreators++;
+        creatorList.push(msg.sender);
 
         emit CreatorRegistered(msg.sender, eventContract);
+    }
+
+    /**
+     * @notice Get all registered users
+     */
+    function getAllUsers() external view returns (address[] memory) {
+        return userList;
+    }
+
+    /**
+     * @notice Get all registered creators
+     */
+    function getAllCreators() external view returns (address[] memory) {
+        return creatorList;
     }
 
     /**

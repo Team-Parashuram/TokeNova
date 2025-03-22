@@ -9,6 +9,7 @@ import {
   LandingPage,
   MyTickets,
 } from "./Pages";
+import Theme from "./store/ThemeStore";
 
 const App = () => {
   const { address } = useAccount();
@@ -27,12 +28,16 @@ const App = () => {
             <Route path="/my-tickets" element={<MyTickets />} />
             <Route path="*" element={<Navigate to="/home" replace />} />
           </Routes>
+          <Theme />
         </Layout>
       ) : (
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <div>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+          <Theme />
+        </div>
       )}
     </>
   );

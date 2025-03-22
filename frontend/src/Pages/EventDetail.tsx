@@ -9,12 +9,14 @@ interface Event {
     description: string;
     date: string;
     location: string;
+    time:string
     price: string;
     ticketsAvailable: number;
     totalTickets: number;
     imageUrl: string;
     organizer: string;
     category: string;
+    calllback: any;
 }
 
 const EventDetail = () => {
@@ -40,6 +42,8 @@ const EventDetail = () => {
                     imageUrl: 'https://via.placeholder.com/800x400',
                     organizer: '0x1234...5678',
                     category: 'Tech',
+                    calllback: () => {},
+                    time: '10:00 AM'
                 };
                 setEvent(mockEvent);
                 setLoading(false);
