@@ -15,6 +15,7 @@ if (!APP_CONTRACT_ADDRESS) {
   throw new Error("Missing environment variables for contract addresses");
 }
 
+
 const provider = new ethers.JsonRpcProvider(RPC_URL);
 const signer = await provider.getSigner(0); // 0 is the first Hardhat account
 
@@ -105,7 +106,7 @@ export const createEvent = async (
       APP_CONTRACT_ADDRESS
     );
 
-    await tx.wait(); // Wait for confirmation
+    await tx.wait(); 
     console.log(" Event created successfully:", tx.hash);
   } catch (error) {
     console.error(" Error creating event:", error);
@@ -114,31 +115,92 @@ export const createEvent = async (
 };
 
 export const getAllEvents = async () => {
-  // Fetch the event creator contract assigned to the user from the App contract
   const appContract = new ethers.Contract(APP_CONTRACT_ADDRESS, AppABI.abi, provider);
-  
   try {
     const creatorProfiles = await appContract.getAllCreators();
-    
-    if (creatorProfiles.length == 0) {
+    if (creatorProfiles.length === 0) {
       throw new Error("No Event Creators exist");
     }
 
-    creatorProfiles(async (creator: { eventContract: string }) => {
-      const eventCreatorAddress = creator.eventContract;
-      const eventCreatorContract = new ethers.Contract(eventCreatorAddress, EventCreatorABI.abi, provider);
-  
-      const events = await eventCreatorContract.getEvents();
-      console.log(" Retrieved events:", events);
-  
-      return events;
-    })
-    
+    // Collect all events from all creators
+    const allEvents = await Promise.all(
+      creatorProfiles.map(async (creator: { eventContract: string }) => {
+        const eventCreatorAddress = creator.eventContract;
+        const eventCreatorContract = new ethers.Contract(eventCreatorAddress, EventCreatorABI.abi, provider);
+        const eventAddresses = await eventCreatorContract.getEvents();
+
+        // Fetch details for each event
+        return Promise.all(
+          eventAddresses.map(async (eventAddress: string) => {
+            const eventContract = new ethers.Contract(eventAddress, EventABI.abi, provider);
+            const details = await eventContract.getEventDetails();
+            return {
+              address: eventAddress,
+              owner: details[0],
+              numTickets: Number(details[1]),
+              numTicketsLeft: Number(details[2]),
+              price: ethers.formatEther(details[3]), // Convert wei to ether
+              royaltyPercent: Number(details[4]),
+              canBeResold: details[5],
+              stage: Number(details[6]),
+              name: details[7],
+              symbol: details[8],
+            };
+          })
+        );
+      })
+    );
+
+    // Flatten the array of arrays into a single array of events
+    return allEvents.flat();
   } catch (error) {
-    console.error(" Error fetching events:", error);
+    console.error("Error fetching events:", error);
     throw new Error("Failed to fetch events");
   }
 };
+
+export const getCreatorEvents = async (creatorAddress: string) => {
+  const appContract = new ethers.Contract(APP_CONTRACT_ADDRESS, AppABI.abi, provider);
+
+  try {
+    // Fetch the creator's profile from the App contract
+    const creatorProfile = await appContract.creators(creatorAddress);
+    const eventCreatorAddress = creatorProfile.eventContract;
+
+    // If no EventCreator contract is assigned (i.e., zero address), return an empty array
+    if (eventCreatorAddress === ethers.ZeroAddress) {
+      return [];
+    }
+
+    // Create an instance of the EventCreator contract
+    const eventCreatorContract = new ethers.Contract(eventCreatorAddress, EventCreatorABI.abi, provider);
+    const eventAddresses = await eventCreatorContract.getEvents();
+
+    // Fetch details for each event
+    const events = await Promise.all(eventAddresses.map(async (eventAddress: string) => {
+      const eventContract = new ethers.Contract(eventAddress, EventABI.abi, provider);
+      const details = await eventContract.getEventDetails();
+      return {
+        address: eventAddress,
+        owner: details[0],
+        numTickets: Number(details[1]),
+        numTicketsLeft: Number(details[2]),
+        price: ethers.formatEther(details[3]), // Convert wei to ether
+        royaltyPercent: Number(details[4]),
+        canBeResold: details[5],
+        stage: Number(details[6]),
+        name: details[7],
+        symbol: details[8],
+      };
+    }));
+
+    return events;
+  } catch (error) {
+    console.error("Error fetching creator events:", error);
+    throw new Error("Failed to fetch creator events");
+  }
+};
+
 
 //Event
 export const buyTicket = async (eventAddress: string, ticketPrice: number) => {

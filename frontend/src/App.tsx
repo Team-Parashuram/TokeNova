@@ -21,7 +21,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Navigate to="/home" replace />} />
             <Route path="/home" element={<HomePage />} />
-            <Route path="/event/:id" element={<EventDetail />} />
+            {/* <Route path="/event/:id" element={<EventDetail />} /> */}
             <Route path="/create-event" element={<CreateEvent />} />
             <Route path="/my-events" element={<MyEvents />} />
             {/* my tickets */}
