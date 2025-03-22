@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
 import { ConnectKitButton } from 'connectkit';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const LandingPage = () => {
@@ -658,9 +658,11 @@ const LandingPage = () => {
                 <div className="text-sm text-gray-500">
                 © {new Date().getFullYear()} Tokenova. All rights reserved.
                 </div>
+                
             </div>
         </div>
         </footer>
+    
         </div>
     )
 };
