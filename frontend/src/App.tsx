@@ -1,15 +1,14 @@
 import { useAccount } from "wagmi";
-import { Routes, Route, Navigate } from "react-router-dom";
-import Layout from "./components/Layout";
 import {
   HomePage,
-  EventDetail,
-  CreateEvent,
   MyEvents,
-  LandingPage,
   MyTickets,
+  LandingPage,
+  CreateEvent,
 } from "./Pages";
 import Theme from "./store/ThemeStore";
+import Layout from "./components/Layout";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 const App = () => {
   const { address } = useAccount();
