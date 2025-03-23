@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { motion } from 'framer-motion';
-import { Event } from '../Types/Event.Types';
+import { Event } from '../Types/Event.types';
 import { useState } from 'react';
 
 interface EventCardProps {
