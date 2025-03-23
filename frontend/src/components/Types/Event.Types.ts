@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface Event {
+    code: any;
+    ticketsRemaining: any;
     id: string;
     name: string;
     description: string;
