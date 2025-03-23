@@ -8,7 +8,6 @@ interface EventCardProps {
     }
 
     const EventCard = ({ event, onEventSelect }: EventCardProps) => {
-    // Calculate percentage of tickets sold
     const soldPercentage = ((event.totalTickets - event.ticketsAvailable) / event.totalTickets) * 100;
 
     return (

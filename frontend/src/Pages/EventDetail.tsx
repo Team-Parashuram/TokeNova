@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAccount } from 'wagmi';
@@ -85,7 +86,7 @@ const EventDetail = () => {
         <div className="relative min-h-screen bg-white text-gray-900 overflow-hidden font-sans">
             {/* Background Grid */}
             <div className="fixed inset-0 -z-10 opacity-5">
-                <div className={`absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" width=\"40\" height=\"40\" viewBox=\"0 0 40 40\"%3E%3Cg fill=\"none\" stroke=\"%23D1D5DB\" stroke-width=\"1\"%3E%3Cpath d=\"M0 0h40v40H0z\"/%3E%3Cpath d=\"M0 0h40M0 40h40M0 0v40M40 0v40\"/%3E%3C/g%3E%3C/svg%3E')]`} />
+                <div className={`absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill='none' stroke='%23D1D5DB' stroke-width='1'%3E%3Cpath d='M0 0h40v40H0z'/%3E%3Cpath d='M0 0h40M0 40h40M0 0v40M40 0v40'/%3E%3C/g%3E%3C/svg%3E')]`} />
             </div>
             {/* Floating Blobs */}
             <div className="fixed inset-0 -z-5 overflow-hidden">
