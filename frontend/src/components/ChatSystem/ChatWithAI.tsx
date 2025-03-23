@@ -19,24 +19,8 @@ const ChatWithAI = () => {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [eventId, setEventId] = useState<string | null>(null);
-  const [modalOpen, setModalOpen] = useState(false);
-  
-  useEffect(() => {
-    const handleEventDetails = async () => {
-      const event_data = await getEventDetails(eventId as string);
-      const eventPrice = event_data?.price || 0; // Replace with the correct property for price
-      if (eventId) {
-        await buyTicket(eventId, eventPrice);
-      } else {
-        console.error("Event ID is null");
-      }
-      toast.success("Booking successful!");
-    };
-
-    if (eventId) {
-      handleEventDetails();
-    }
-  }, [eventId]);
+  const [eventPrice, setEventPrice] = useState<number | null>(null);
+  const userAddress = useAccount().address;
 
   useEffect(() => {
     async function getData() {
@@ -106,10 +90,10 @@ const ChatWithAI = () => {
         );
 
         if(res.data.response.action === "confirm_booking"){
-          
           toast.success("Booking confirmed for the event");
           setEventId(res.data.response.event_id);
-          setModalOpen(true);
+          const ans = getEventDetails(res.data.response.event_id);
+          buyTicket(userAddress!,eventId!, (await ans).price);
         }
         const botMessage = {
           text: DOMPurify.sanitize(res.data.response.message),
@@ -131,9 +115,6 @@ const ChatWithAI = () => {
 
   return (
     <div className="relative">
-      {modalOpen && (
-        <h1>Booked</h1>
-      )}
       <div
         className="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md bg-purple-50 text-purple-700 hover:bg-purple-100 transition-colors cursor-pointer"
         onClick={toggleSidebar}
