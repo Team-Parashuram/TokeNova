@@ -186,49 +186,15 @@ export const buyTicket = async (eventAddress: string, ticketPrice: number) => {
   }
 
   const signer = await getSigner();
-  const userAddress = await signer.getAddress();
 
   const eventContract = new ethers.Contract(eventAddress, EventABI.abi, signer);
-  console.log(signer);
   try {
     const tx = await eventContract.buyTicket({
       value: ethers.parseEther(ticketPrice.toString()),
     });
 
     await tx.wait();
-    console.log("Ticket purchased successfully:", tx.hash);
 
-    let ticketID;
-
-    console.log("Receipt logs:", tx.logs);
-    for (const log of tx.logs) {
-      try {
-        const parsedLog = eventContract.interface.parseLog(log);
-        console.log("Parsed log:", parsedLog);
-        if (parsedLog?.name === "TicketPurchased") {
-          console.log("TicketPurchased event found:", parsedLog);
-          ticketID = parsedLog?.args.ticketID;
-          console.log("Extracted ticketID:", ticketID);
-          break;
-        }
-      } catch (e) {
-        console.log(`Error parsing log: ${e}`);
-      }
-    }
-
-    console.log("Adding ticket to user record:", {
-      userAddress,
-      eventAddress,
-      ticketID,
-      USER_CONTRACT_ADDRESS,
-    });
-
-    await addUserTicket(
-      userAddress,
-      eventAddress,
-      ticketID,
-      USER_CONTRACT_ADDRESS
-    );
     return tx.hash;
   } catch (error) {
     console.error("Error buying ticket:", error);
