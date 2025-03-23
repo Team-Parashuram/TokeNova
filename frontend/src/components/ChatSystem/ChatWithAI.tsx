@@ -1,21 +1,23 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { MessageCircleCodeIcon, X, Send } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
-import { dummyMessages } from "../Dummy/Chat";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useUserStore } from "@/store/store";
 import { useBalance, useAccount } from "wagmi";
 import { Event } from "../Types/Event.Types";
 import { getAllEvents } from "@/web-3/blockchain";
-import axios from "axios";
-import { useUserStore } from "@/store/store";
 
 const ChatWithAI = () => {
   const user = useUserStore((state) => state.user);
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  const [messages, setMessages] = useState(dummyMessages);
+  const [messages, setMessages] = useState<
+    { text: string; sender: string; timestamp: string }[]
+  >([]);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-
   const [allEvents, setAllEvents] = useState<Event[]>([]);
+
   useEffect(() => {
     async function getData() {
       const events = await getAllEvents();
@@ -25,25 +27,10 @@ const ChatWithAI = () => {
   }, []);
 
   const account = useAccount();
-
-  const balance = useBalance({
-    address: account.address
-  });
-
+  const balance = useBalance({ address: account.address });
 
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-
-      const URL = import.meta.env.VITE_URL;
-      const res = axios.post(URL,{
-        "userId": user?.id, 
-        "balance": balance
-      })
-    } else {
-      document.body.style.overflow = "auto";
-    }
-
+    document.body.style.overflow = open ? "hidden" : "auto";
     return () => {
       document.body.style.overflow = "auto";
     };
@@ -56,27 +43,52 @@ const ChatWithAI = () => {
     }
   }, [messages]);
 
-  const toggleSidebar = () => {
-    setOpen(!open);
-  };
+  const toggleSidebar = () => setOpen(!open);
 
-  const handleSend = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSend = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (inputValue.trim()) {
-      const newMessage = {
+      const userMessage = {
         text: inputValue,
         sender: "user",
         timestamp: new Date().toISOString(),
       };
+      setMessages((prev) => [...prev, userMessage]);
 
-      setMessages([...messages, newMessage]);
+      console.log("user id", user?.id);
+      const payload = {
+        userId: user?.id || "unknown",
+        balance: balance.data?.formatted
+        ? parseInt(balance.data.formatted.replace(/,/g, ""))
+        : 0,
+        events: allEvents,
+        message: inputValue,
+      };
+      console.log(payload);
+
+      try {
+        const { data } = await axios.post(
+          "http://127.0.0.1:3000/chatbot",
+          payload
+        );
+        const botMessage = {
+          text: data.response.message,
+          sender: "bot",
+          timestamp: new Date().toISOString(),
+        };
+        setMessages((prev) => [...prev, botMessage]);
+        toast.success("Message sent to AI");
+      } catch (error) {
+        console.error("Error sending message to AI:", error);
+        toast.error("Failed to get response from AI");
+      }
+
       setInputValue("");
     }
   };
 
   return (
     <div className="relative">
-      {/* This is the simplpe Button  */}
       <div
         className="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md bg-purple-50 text-purple-700 hover:bg-purple-100 transition-colors cursor-pointer"
         onClick={toggleSidebar}
@@ -85,7 +97,6 @@ const ChatWithAI = () => {
         <span>Ask AI</span>
       </div>
 
-      {/* This is when the sidebar is open */}
       {open && (
         <div className="fixed inset-0 z-50" onClick={toggleSidebar}>
           <div
@@ -93,19 +104,16 @@ const ChatWithAI = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex flex-col h-full">
-              <div className="p-4 border-b">
-                <div className="flex justify-between items-center">
-                  <h3 className="font-medium text-xl">AI Assistant</h3>
-                  <button
-                    onClick={toggleSidebar}
-                    className="p-1 rounded-full hover:bg-gray-100"
-                  >
-                    <X size={20} />
-                  </button>
-                </div>
+              <div className="p-4 border-b flex justify-between items-center">
+                <h3 className="font-medium text-xl">AI Assistant</h3>
+                <button
+                  onClick={toggleSidebar}
+                  className="p-1 rounded-full hover:bg-gray-100"
+                >
+                  <X size={20} />
+                </button>
               </div>
 
-              {/* This saves all the messages that have happened yet */}
               <div
                 ref={messagesContainerRef}
                 className="flex-1 overflow-y-auto p-4 space-y-4"
@@ -138,7 +146,6 @@ const ChatWithAI = () => {
                 )}
               </div>
 
-              {/* This is Message Senfing Div */}
               <div className="p-4 border-t">
                 <form onSubmit={handleSend} className="flex gap-2">
                   <input

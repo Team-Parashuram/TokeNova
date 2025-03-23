@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS, cross_origin
 import google.generativeai as genai
 import json
 import os
@@ -13,6 +14,7 @@ API_KEY = os.getenv('GEMINI_API_KEY')
 genai.configure(api_key=API_KEY)
 
 app = Flask(__name__)
+cors = CORS(app)
 
 # Dictionary to store user chat sessions
 user_sessions = {}
@@ -158,11 +160,11 @@ def chatbot():
         user_message = data.get('message')
         
         # Validate required data
-        if not user_id or user_balance is None or not events_array:
-            return jsonify({
-                "status": "error",
-                "message": "Missing required user information or events data"
-            }), 400
+        # if not user_id or user_balance is None or not events_array:
+        #     return jsonify({
+        #         "status": "error",
+        #         "message": "Missing required user information or events data"
+        #     }), 400
             
         # Check if this is an existing or new user session
         if user_id in user_sessions:
