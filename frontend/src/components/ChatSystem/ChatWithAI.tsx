@@ -1,7 +1,7 @@
 import axios from "axios";
 import DOMPurify from "dompurify";
 import toast from "react-hot-toast";
-import { Event } from "../Types/Event.types";
+import { Event } from "../Types/Event.Types";
 import { useUserStore } from "@/store/store";
 import { useBalance, useAccount } from "wagmi";
 import { buyTicket, getAllEvents, getEventDetails } from "@/web-3/blockchain";
@@ -23,7 +23,10 @@ const ChatWithAI = () => {
 
   useEffect(() => {
     async function getData() {
-      const events = await getAllEvents();
+      const events = (await getAllEvents())?.map(event => ({
+        ...event,
+        id: event.address
+      }));
       if (Array.isArray(events)) setAllEvents(events);
     }
     getData();
@@ -91,8 +94,8 @@ const ChatWithAI = () => {
         if(res.data.response.action === "confirm_booking"){
           toast.success("Booking confirmed for the event");
           setEventId(res.data.response.event_id);
-          const ans = getEventDetails(res.data.response.event_id);
-          buyTicket(userAddress!,eventId!, (await ans).price);
+          const ans = await getEventDetails(res.data.response.event_id);
+          buyTicket(userAddress!,eventId!, (ans).price);
         }
         const botMessage = {
           text: DOMPurify.sanitize(res.data.response.message),
