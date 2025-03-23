@@ -7,6 +7,7 @@ import Work from "./Work";
 import Faq from "./Faq";
 import Footer from "./Footer";
 import Header from "./Header";
+import Cta from "./Cta";
 
 const LandingPage = () => {
   const [scrollY, setScrollY] = useState(0);
@@ -92,6 +93,7 @@ const LandingPage = () => {
       <TechSection />
       <Featured />
       <Work />
+      <Cta />
       <Faq />
       <Footer />
     </div>
