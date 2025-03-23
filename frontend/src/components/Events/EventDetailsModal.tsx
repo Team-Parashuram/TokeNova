@@ -3,22 +3,7 @@ import { motion } from 'framer-motion';
 import { Button } from '../ui/button';
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
-
-interface Event {
-    id: string;
-    name: string;
-    description: string;
-    date: string;
-    location: string;
-    time: string;
-    price: number;
-    ticketsAvailable: number;
-    totalTickets: number;
-    imageUrl: string;
-    organizer: string;
-    category: string;
-    calllback: any;
-}
+import { Event } from '../Types/Event.Types';
 
 interface EventDetailsModalProps {
     event: Event;

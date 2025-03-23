@@ -1,6 +1,6 @@
 import EventCard from "@/components/Events/EventCard";
+import { Event } from "@/components/Types/Event.Types";
 import { motion, AnimatePresence } from "framer-motion";
-import { Event } from "./EventData";
 
 interface EventListProps {
   events: Event[];

@@ -4,22 +4,8 @@ import { useAccount } from 'wagmi';
 import { motion } from 'framer-motion';
 import { getCreatorEvents } from '@/web-3/blockchain';
 import EventDetailsModal from "../../src/components/Events/EventDetailsModal"
+import { Event } from '@/components/Types/Event.Types';
 
-interface Event {
-    id: string;
-    name: string;
-    description: string;
-    date: string;
-    location: string;
-    time: string;
-    price: string;
-    ticketsAvailable: number;
-    totalTickets: number;
-    imageUrl: string;
-    organizer: string;
-    category: string;
-    calllback: any;
-}
 
 const MyEvents = () => {
     const { address } = useAccount();
@@ -77,7 +63,7 @@ const MyEvents = () => {
             <div className="relative min-h-screen bg-white text-gray-900 overflow-hidden font-sans">
                 <div className="fixed inset-0 -z-10 opacity-5">
                     <div
-                        className={`absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" width=\"40\" height=\"40\" viewBox=\"0 0 40 40\"%3E%3Cg fill=\"none\" stroke=\"%23D1D5DB\" stroke-width=\"1\"%3E%3Cpath d=\"M0 0h40v40H0z\"/%3E%3Cpath d=\"M0 0h40M0 40h40M0 0v40M40 0v40\"/%3E%3C/g%3E%3C/svg%3E')]`}
+                        className={`absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"%3E%3Cg fill="none" stroke="%23D1D5DB" stroke-width="1"%3E%3Cpath d="M0 0h40v40H0z"/%3E%3Cpath d="M0 0h40M0 40h40M0 0v40M40 0v40"/%3E%3C/g%3E%3C/svg%3E')]`}
                     />
                 </div>
                 <div className="fixed inset-0 -z-5 overflow-hidden">
@@ -111,7 +97,7 @@ const MyEvents = () => {
         <div className="relative min-h-screen bg-white text-gray-900 overflow-hidden font-sans">
             <div className="fixed inset-0 -z-10 opacity-5">
                 <div
-                    className={`absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" width=\"40\" height=\"40\" viewBox=\"0 0 40 40\"%3E%3Cg fill=\"none\" stroke=\"%23D1D5DB\" stroke-width=\"1\"%3E%3Cpath d=\"M0 0h40v40H0z\"/%3E%3Cpath d=\"M0 0h40M0 40h40M0 0v40M40 0v40\"/%3E%3C/g%3E%3C/svg%3E')]`}
+                    className={`absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"%3E%3Cg fill="none" stroke="%23D1D5DB" stroke-width="1"%3E%3Cpath d="M0 0h40v40H0z"/%3E%3Cpath d="M0 0h40M0 40h40M0 0v40M40 0v40"/%3E%3C/g%3E%3C/svg%3E')]`}
                 />
             </div>
             <div className="fixed inset-0 -z-5 overflow-hidden">

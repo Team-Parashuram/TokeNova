@@ -3,22 +3,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAccount } from 'wagmi';
 import { motion } from 'framer-motion';
-
-interface Event {
-    id: string;
-    name: string;
-    description: string;
-    date: string;
-    location: string;
-    time:string
-    price: string;
-    ticketsAvailable: number;
-    totalTickets: number;
-    imageUrl: string;
-    organizer: string;
-    category: string;
-    calllback: any;
-}
+import { Event } from '@/components/Types/Event.Types';
 
 const EventDetail = () => {
     const { id } = useParams<{ id: string }>();
@@ -37,7 +22,7 @@ const EventDetail = () => {
                         'Join us for the biggest Ethereum developer event of the year with keynotes from Vitalik Buterin and other industry leaders. This two-day event will cover the latest developments in Ethereum, Layer 2 solutions, and emerging use cases.',
                     date: '2025-04-15',
                     location: 'Virtual',
-                    price: '0.1',
+                    price: 0.1,
                     ticketsAvailable: 350,
                     totalTickets: 500,
                     imageUrl: 'https://via.placeholder.com/800x400',
@@ -175,7 +160,7 @@ const EventDetail = () => {
                                 <div>
                                     <h3 className="text-xl font-bold text-indigo-600">{event.price} ETH per ticket</h3>
                                     <p className="text-gray-600">{event.ticketsAvailable}/{event.totalTickets} tickets available</p>
-                                    <p className="text-gray-700 mt-2">Total: {(parseFloat(event.price) * quantity).toFixed(2)} ETH</p>
+                                    <p className="text-gray-700 mt-2">Total: {(parseInt(event.price.toString()) * quantity).toFixed(2)} ETH</p>
                                 </div>
                                 <div className="mt-4 md:mt-0 flex items-center bg-white rounded-lg border border-gray-200">
                                     <button

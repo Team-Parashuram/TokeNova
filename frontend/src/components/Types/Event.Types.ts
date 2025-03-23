@@ -6,7 +6,7 @@ interface Event {
     date: string;
     location: string;
     time:string
-    price: string;
+    price: number;
     ticketsAvailable: number;
     totalTickets: number;
     imageUrl: string;
