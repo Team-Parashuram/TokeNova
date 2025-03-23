@@ -112,7 +112,7 @@ export const getAllEvents = async () => {
               name: details[7],
               symbol: details[8],
               date: details[9],
-              location: details[10]
+              location: details[10],
             };
           })
         );
@@ -140,7 +140,7 @@ export const getCreatorEvents = async (creatorAddress: string) => {
     const eventAddresses = await eventCreatorContract.getCreatorEvents(
       creatorAddress
     );
-    console.log(eventAddresses)
+    console.log(eventAddresses);
     if (eventAddresses.length === 0) {
       return [];
     }
@@ -470,5 +470,23 @@ export const getUserTickets = async (
   } catch (error) {
     console.error("Error fetching tickets:", error);
     throw new Error("Failed to fetch tickets");
+  }
+};
+
+export const deleteEvent = async (CONTRACT_ADDRESS: string) => {
+  const signer = await getSigner();
+  const EventContract = new ethers.Contract(
+    CONTRACT_ADDRESS,
+    EventABI.abi,
+    signer
+  );
+  try {
+    const tx = await EventContract.setStage(3);
+
+    await tx.wait(); // Wait for confirmation
+    alert("Event cancelled successfully!");
+  } catch (error) {
+    console.error("Error cancelling event:", error);
+    alert("Failed to cancel the event.");
   }
 };
