@@ -50,7 +50,7 @@ const CreateEvent = () => {
     setError(null);
 
     try {
-      const { name, totalTickets, price, canBeResold, royaltyPercent } =
+      const { name, totalTickets, price, canBeResold, royaltyPercent, location, date } =
         formData;
 
       const numTickets = parseInt(totalTickets.toString(), 10);
@@ -66,8 +66,6 @@ const CreateEvent = () => {
       if (isNaN(royalty) || royalty < 0 || royalty > 100) {
         throw new Error("Royalty percent must be between 0 and 100");
       }
-      const date = new Date();
-      const timeInSeconds = Math.floor(date.getTime() / 1000);
 
       await createEvent(
         numTickets,
@@ -76,8 +74,8 @@ const CreateEvent = () => {
         royaltyPercent,
         name,
         name.substring(0, 3).toUpperCase(),
-        timeInSeconds,
-        address
+        new Date(date).getTime(),
+        location,
       );
 
       setSuccess(true);
@@ -135,9 +133,8 @@ const CreateEvent = () => {
               {/* Fixed Toggle Switch */}
               <div className="flex items-center space-x-3 bg-gray-50 p-2 rounded-lg">
                 <span
-                  className={`text-sm font-medium ${
-                    !useAI ? "text-gray-900" : "text-gray-500"
-                  }`}
+                  className={`text-sm font-medium ${!useAI ? "text-gray-900" : "text-gray-500"
+                    }`}
                 >
                   Manual
                 </span>
@@ -152,9 +149,8 @@ const CreateEvent = () => {
                   <div className="absolute top-1 left-1 w-5 h-5 bg-white rounded-full shadow-md transition-all duration-300 peer-checked:translate-x-7"></div>
                 </label>
                 <span
-                  className={`text-sm font-medium ${
-                    useAI ? "text-gray-900" : "text-gray-500"
-                  }`}
+                  className={`text-sm font-medium ${useAI ? "text-gray-900" : "text-gray-500"
+                    }`}
                 >
                   AI-Assisted
                 </span>

@@ -40,6 +40,8 @@ const HomePage = () => {
           ticketsAvailable: event.numTicketsLeft,
           totalTickets: event.numTickets,
           organizer: event.owner,
+          location: event.location,
+          date: event.date
         }));
         setEvents(mappedEvents);
         setCategories([

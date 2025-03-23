@@ -92,6 +92,7 @@ export const getAllEvents = async () => {
           eventAddresses.map(async (eventAddress: string) => {
             const eventContract = new ethers.Contract(eventAddress, EventABI.abi, signer);
             const details = await eventContract.getEventDetails();
+            // console.log(details)
             return {
               address: eventAddress,
               owner: details[0],
@@ -103,6 +104,8 @@ export const getAllEvents = async () => {
               stage: Number(details[6]),
               name: details[7],
               symbol: details[8],
+              date: details[9],
+              location: details[10]
             };
           })
         );
