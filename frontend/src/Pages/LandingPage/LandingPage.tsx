@@ -8,6 +8,7 @@ import Faq from "./Faq";
 import Footer from "./Footer";
 import Header from "./Header";
 import Cta from "./Cta";
+import VideoSection from "./VideoSection";
 
 const LandingPage = () => {
   const [scrollY, setScrollY] = useState(0);
@@ -91,6 +92,7 @@ const LandingPage = () => {
 
       <HeroSection />
       <TechSection />
+      <VideoSection />
       <Featured />
       <Work />
       <Cta />
