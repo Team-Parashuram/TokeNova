@@ -6,8 +6,9 @@ import EventCreatorABI from "@/../../web3-contracts/artifacts/contracts/EventCre
 import EventABI from "@/../../web3-contracts/artifacts/contracts/Event.sol/Event.json";
 import UserABI from "@/../../web3-contracts/artifacts/contracts/User.sol/User.json";
 
-const EVENT_CREATOR_CONTRACT_ADDRESS = import.meta.env.VITE_EVENT_CREATOR_CONTRACT_ADDRESS
-const USER_CONTRACT_ADDRESS = import.meta.env.VITE_USER_CONTRACT_ADDRESS
+const EVENT_CREATOR_CONTRACT_ADDRESS = import.meta.env
+  .VITE_EVENT_CREATOR_CONTRACT_ADDRESS;
+const USER_CONTRACT_ADDRESS = import.meta.env.VITE_USER_CONTRACT_ADDRESS;
 const RPC_URL = import.meta.env.VITE_RPC_URL;
 
 if (!EVENT_CREATOR_CONTRACT_ADDRESS || !USER_CONTRACT_ADDRESS || !RPC_URL) {
@@ -77,7 +78,7 @@ export const getAllEvents = async () => {
     );
 
     const creators = await eventCreatorContract.getAllCreators();
-    
+
     if (creators.length === 0) {
       return [];
     }
@@ -85,12 +86,18 @@ export const getAllEvents = async () => {
     // Collect all events from all creators
     const allEvents = await Promise.all(
       creators.map(async (creatorAddress: string) => {
-        const eventAddresses = await eventCreatorContract.getCreatorEvents(creatorAddress);
+        const eventAddresses = await eventCreatorContract.getCreatorEvents(
+          creatorAddress
+        );
 
         // Fetch details for each event
         return Promise.all(
           eventAddresses.map(async (eventAddress: string) => {
-            const eventContract = new ethers.Contract(eventAddress, EventABI.abi, signer);
+            const eventContract = new ethers.Contract(
+              eventAddress,
+              EventABI.abi,
+              signer
+            );
             const details = await eventContract.getEventDetails();
             // console.log(details)
             return {
@@ -121,19 +128,31 @@ export const getAllEvents = async () => {
 
 export const getCreatorEvents = async (creatorAddress: string) => {
   try {
-    const eventCreatorContract = new ethers.Contract(EVENT_CREATOR_CONTRACT_ADDRESS, EventCreatorABI.abi, provider);
+    const signer = await getSigner();
+
+    const eventCreatorContract = new ethers.Contract(
+      EVENT_CREATOR_CONTRACT_ADDRESS,
+      EventCreatorABI.abi,
+      provider
+    );
 
     // Fetch events created by this creator
-    const eventAddresses = await eventCreatorContract.getCreatorEvents(creatorAddress);
+    const eventAddresses = await eventCreatorContract.getCreatorEvents(
+      creatorAddress
+    );
 
     if (eventAddresses.length === 0) {
       return [];
     }
 
     // Fetch event details
-    const events = await Promise.all(
+    const events = Promise.all(
       eventAddresses.map(async (eventAddress: string) => {
-        const eventContract = new ethers.Contract(eventAddress, EventABI.abi, provider);
+        const eventContract = new ethers.Contract(
+          eventAddress,
+          EventABI.abi,
+          signer
+        );
         const details = await eventContract.getEventDetails();
         return {
           address: eventAddress,
@@ -152,7 +171,10 @@ export const getCreatorEvents = async (creatorAddress: string) => {
 
     return events;
   } catch (error) {
-    console.error(`Error fetching events for creator ${creatorAddress}:`, error);
+    console.error(
+      `Error fetching events for creator ${creatorAddress}:`,
+      error
+    );
     throw new Error("Failed to fetch creator events.");
   }
 };
@@ -164,13 +186,10 @@ export const buyTicket = async (eventAddress: string, ticketPrice: number) => {
   }
 
   const signer = await getSigner();
+  const userAddress = await signer.getAddress();
 
-  const eventContract = new ethers.Contract(
-    eventAddress,
-    EventABI.abi,
-    signer
-  );
-
+  const eventContract = new ethers.Contract(eventAddress, EventABI.abi, signer);
+  console.log(signer);
   try {
     const tx = await eventContract.buyTicket({
       value: ethers.parseEther(ticketPrice.toString()),
@@ -178,6 +197,38 @@ export const buyTicket = async (eventAddress: string, ticketPrice: number) => {
 
     await tx.wait();
     console.log("Ticket purchased successfully:", tx.hash);
+
+    let ticketID;
+
+    console.log("Receipt logs:", tx.logs);
+    for (const log of tx.logs) {
+      try {
+        const parsedLog = eventContract.interface.parseLog(log);
+        console.log("Parsed log:", parsedLog);
+        if (parsedLog?.name === "TicketPurchased") {
+          console.log("TicketPurchased event found:", parsedLog);
+          ticketID = parsedLog?.args.ticketID;
+          console.log("Extracted ticketID:", ticketID);
+          break;
+        }
+      } catch (e) {
+        console.log(`Error parsing log: ${e}`);
+      }
+    }
+
+    console.log("Adding ticket to user record:", {
+      userAddress,
+      eventAddress,
+      ticketID,
+      USER_CONTRACT_ADDRESS,
+    });
+
+    await addUserTicket(
+      userAddress,
+      eventAddress,
+      ticketID,
+      USER_CONTRACT_ADDRESS
+    );
     return tx.hash;
   } catch (error) {
     console.error("Error buying ticket:", error);
@@ -185,7 +236,11 @@ export const buyTicket = async (eventAddress: string, ticketPrice: number) => {
   }
 };
 
-export const buyTicketFromUser = async (eventAddress: string, ticketID: number, resalePrice: number) => {
+export const buyTicketFromUser = async (
+  eventAddress: string,
+  ticketID: number,
+  resalePrice: number
+) => {
   if (!eventAddress) {
     throw new Error("Event address is required");
   }
@@ -208,7 +263,10 @@ export const buyTicketFromUser = async (eventAddress: string, ticketID: number, 
   }
 };
 
-export const setTicketToUsed = async (eventAddress: string, ticketID: number) => {
+export const setTicketToUsed = async (
+  eventAddress: string,
+  ticketID: number
+) => {
   if (!eventAddress) {
     throw new Error("Event address is required");
   }
@@ -323,7 +381,11 @@ export const getEventDetails = async (eventAddress: string) => {
     throw new Error("Event address is required");
   }
 
-  const eventContract = new ethers.Contract(eventAddress, EventABI.abi, provider);
+  const eventContract = new ethers.Contract(
+    eventAddress,
+    EventABI.abi,
+    provider
+  );
 
   try {
     const details = await eventContract.getEventDetails();
@@ -357,10 +419,18 @@ export const addUserTicket = async (
   }
   const signer = await getSigner();
 
-  const userContract = new ethers.Contract(userContractAddress, UserABI.abi, signer);
+  const userContract = new ethers.Contract(
+    userContractAddress,
+    UserABI.abi,
+    signer
+  );
 
   try {
-    const tx = await userContract.addTicket(userAddress, eventContract, ticketID);
+    const tx = await userContract.addTicket(
+      userAddress,
+      eventContract,
+      ticketID
+    );
     await tx.wait(); // Wait for transaction confirmation
 
     console.log(`Ticket added successfully: ${ticketID}`);
@@ -371,17 +441,28 @@ export const addUserTicket = async (
   }
 };
 
-export const getUserTickets = async (userAddress: string, userContractAddress: string) => {
+export const getUserTickets = async (
+  userAddress: string,
+  userContractAddress: string
+) => {
   if (!userAddress) {
     throw new Error("User address is required");
   }
 
+  console.log("Fetching tickets for user:", userAddress);
+  console.log("Using User contract:", userContractAddress);
+
   const signer = await getSigner();
-  const userContract = new ethers.Contract(userContractAddress, UserABI.abi, signer);
+  const userContract = new ethers.Contract(
+    userContractAddress,
+    UserABI.abi,
+    signer
+  );
 
   try {
     const tickets = await userContract.getTickets(userAddress);
-    
+    console.log("Raw tickets data:", tickets);
+
     return tickets.map((ticket: any) => ({
       eventContract: ticket.eventContract,
       ticketID: Number(ticket.ticketID),

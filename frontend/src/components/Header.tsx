@@ -81,8 +81,7 @@ const Header = () => {
             <ChatWithAI />
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-10">
+          <nav className="hidden md:flex items-center space-x-8">
             {[
               { name: "Explore", path: "/home" },
               ...(address
