@@ -21,8 +21,8 @@ const CreateEvent = () => {
         totalTickets: 100,
         category: '',
         imageUrl: '',
-        canBeResold: false, // Added for blockchain integration
-        royaltyPercent: 0,  // Added for blockchain integration
+        canBeResold: false,
+        royaltyPercent: 0,
     });
     const [error, setError] = useState<string | null>(null);
 
@@ -121,16 +121,19 @@ const CreateEvent = () => {
             if (isNaN(royalty) || royalty < 0 || royalty > 100) {
                 throw new Error('Royalty percent must be between 0 and 100');
             }
+            const date = new Date();
+            const timeInSeconds = Math.floor(date.getTime() / 1000);
 
             // Call the blockchain function
             await createEvent(
-                address,
                 numTickets,
                 ticketPrice,
                 canBeResold,
-                royalty,
+                royaltyPercent,
                 name,
-                name.substring(0, 3).toUpperCase()
+                name.substring(0, 3).toUpperCase(),
+                timeInSeconds,
+                address,
             );
 
             alert('Event created successfully on the blockchain!');

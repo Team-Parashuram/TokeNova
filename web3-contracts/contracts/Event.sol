@@ -51,6 +51,9 @@ contract Event is ERC721, ReentrancyGuard {
 
     address public userContract;
 
+    uint256 public eventDate;
+    string public eventPlace;
+
     // to store the balances for buyers and organizers
     mapping(address => uint256) public balances;
     mapping(address => bool) public isUserRefund;
@@ -87,7 +90,9 @@ contract Event is ERC721, ReentrancyGuard {
         uint256 _royaltyPercent,
         string memory _eventName,
         string memory _eventSymbol,
-        address _userContract
+        address _userContract,
+        uint256 _eventDate,
+        string memory _eventPlace
     ) ERC721(_eventName, _eventSymbol) {
         require(
             _royaltyPercent >= 0 && _royaltyPercent <= 100,
@@ -103,6 +108,8 @@ contract Event is ERC721, ReentrancyGuard {
         royaltyPercent = _royaltyPercent;
         stage = Stages.Prep;
         userContract = _userContract;
+        eventDate = _eventDate;
+        eventPlace = _eventPlace;
     }
 
     /**
@@ -300,6 +307,8 @@ contract Event is ERC721, ReentrancyGuard {
             bool,
             Stages,
             string memory,
+            string memory,
+            uint256,
             string memory
         )
     {
@@ -312,7 +321,9 @@ contract Event is ERC721, ReentrancyGuard {
             canBeResold,
             stage,
             name(),
-            symbol()
+            symbol(),
+            eventDate,
+            eventPlace
         );
     }
 

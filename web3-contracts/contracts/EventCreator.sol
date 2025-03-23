@@ -4,20 +4,29 @@ pragma solidity >=0.8.0 <0.9.0;
 import "./Event.sol";
 
 contract EventCreator {
-    uint public TotalEvents = 0;
+    struct Creator {
+        address creatorAddress;
+        address[] events; // Stores event contract addresses created by the creator
+    }
 
-    Event[] public events;
+    uint public totalEvents = 0;
+    mapping(address => Creator) public creators;
+    address[] public creatorList; // Stores all unique creators
 
-    event CreateEvent(address _creator, address _event);
+    event CreateEvent(address indexed creator, address eventAddress);
 
     /**
-     * @notice Creates Events
+     * @notice Creates an event and deploys an Event contract
      * @param _numTickets Number of tickets
      * @param _price Price per ticket
      * @param _canBeResold Are tickets allowed to be resold
-     * @param _royaltyPercent Royalty percentage accrued by organizers on reselling of ticket
-     * @param _eventName Name of the Ticket NFT
-     * @param _eventSymbol Symbol for the Ticket NFT Token
+     * @param _royaltyPercent Royalty percentage for resales
+     * @param _eventName Name of the event
+     * @param _eventSymbol Symbol for the event tickets
+     * @param _userContract Address of the User contract
+     * @param _eventDate Date of the event (Unix timestamp)
+     * @param _eventPlace Place of the event
+     * @return newEvent The address of the newly created event contract
      */
     function createEvent(
         uint256 _numTickets,
@@ -26,9 +35,11 @@ contract EventCreator {
         uint256 _royaltyPercent,
         string memory _eventName,
         string memory _eventSymbol,
-        address _userContract
+        address _userContract,
+        uint256 _eventDate,
+        string memory _eventPlace
     ) external returns (address newEvent) {
-        // Create a new Event smart contract
+        // Deploy a new Event contract
         Event e = new Event(
             msg.sender,
             _numTickets,
@@ -37,22 +48,40 @@ contract EventCreator {
             _royaltyPercent,
             _eventName,
             _eventSymbol,
-            _userContract
+            _userContract,
+            _eventDate,
+            _eventPlace
         );
-        events.push(e);
-        TotalEvents++;
 
-        // Store/return event address
+        // If it's a new creator, add them to the creator list
+        if (creators[msg.sender].creatorAddress == address(0)) {
+            creators[msg.sender].creatorAddress = msg.sender;
+            creatorList.push(msg.sender);
+        }
+
+        // Store the event under the creator's record
+        creators[msg.sender].events.push(address(e));
+        totalEvents++;
+
         emit CreateEvent(msg.sender, address(e));
 
         return address(e);
     }
 
-    function getEvents() external view returns (address[] memory) {
-        address[] memory eventAddresses = new address[](TotalEvents);
-        for (uint256 i = 0; i < events.length; i++) {
-            eventAddresses[i] = address(events[i]);
-        }
-        return eventAddresses;
+    /**
+     * @notice Retrieves all event contract addresses created by a specific creator
+     * @param _creator The creator's address
+     * @return eventAddresses Array of event contract addresses
+     */
+    function getCreatorEvents(address _creator) external view returns (address[] memory) {
+        return creators[_creator].events;
+    }
+
+    /**
+     * @notice Retrieves all registered event creators
+     * @return Array of creator addresses
+     */
+    function getAllCreators() external view returns (address[] memory) {
+        return creatorList;
     }
 }
