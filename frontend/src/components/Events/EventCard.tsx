@@ -76,17 +76,6 @@ const EventCard = ({ event, onEventSelect, onCancelEvent }: EventCardProps) => {
       {/* Image container with gradient overlay */}
       <div className="relative h-52 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent z-10" />
-        <div className="absolute inset-0 bg-gray-300">
-          <img
-            src={event.imageUrl || "/placeholder-event.jpg"}
-            alt={event.name}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = "/placeholder-event.jpg";
-            }}
-          />
-        </div>
         
         {/* Category badge - repositioned */}
         <div className="absolute top-4 left-4 z-20">
