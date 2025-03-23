@@ -84,6 +84,12 @@ const Header = () => {
                 >
                   My Events
                 </a>
+                <a 
+                  onClick={() => navigateTo('/my-tickets')} 
+                  className="text-black hover:text-purple-400 transition cursor-pointer"
+                >
+                  My Tickets
+                </a>
               </>
             )}
             <a href="#" className="text-black hover:text-purple-400 transition cursor-pointer">
