@@ -71,6 +71,7 @@ const ChatWithAI = () => {
           formattedBalance = 0;
         }
       }
+      console.log('h')
 
       const payload = {
         userId: user?.id || "unknown",
@@ -78,6 +79,7 @@ const ChatWithAI = () => {
         events: allEvents,
         message: inputValue,
       };
+      console.log(payload)
 
       const safePayload = JSON.parse(
         JSON.stringify(payload, (_, value) =>
@@ -94,8 +96,8 @@ const ChatWithAI = () => {
         if(res.data.response.action === "confirm_booking"){
           toast.success("Booking confirmed for the event");
           setEventId(res.data.response.event_id);
-          const ans = await getEventDetails(res.data.response.event_id);
-          buyTicket(userAddress!,eventId!, (ans).price);
+          const ans = getEventDetails(res.data.response.event_id);
+          buyTicket(userAddress!,eventId!, (await ans).price);
         }
         const botMessage = {
           text: DOMPurify.sanitize(res.data.response.message),
