@@ -48,8 +48,6 @@ const EventCard = ({ event, onEventSelect }: EventCardProps) => {
                     {event.location}
                 </div>
 
-                <p className="text-gray-600 mb-6 line-clamp-2 text-sm">{event.description}</p>
-
                 <div className="pt-4 border-t border-gray-100 flex justify-between items-center">
                     <div className="font-bold text-indigo-700">{event.price} ETH</div>
 

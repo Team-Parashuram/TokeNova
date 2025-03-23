@@ -49,7 +49,7 @@ const Header = () => {
           scrolled
             ? "bg-white/95 backdrop-blur-md shadow-md border-b border-purple-200"
             : "bg-transparent"
-          }`}
+        }`}
       >
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
           {/* Logo Section */}
@@ -86,9 +86,10 @@ const Header = () => {
               { name: "Explore", path: "/home" },
               ...(address
                 ? [
-                  { name: "Create Event", path: "/create-event" },
-                  { name: "My Events", path: "/my-events" },
-                ]
+                    { name: "Create Event", path: "/create-event" },
+                    { name: "My Events", path: "/my-events" },
+                    { name: "My Ticket", path: "/my-tickets" },
+                  ]
                 : []),
             ].map((item, index) => (
               <div key={index} className="relative">
@@ -218,6 +219,7 @@ const Header = () => {
                       ? [
                           { name: "Create Event", path: "/create-event" },
                           { name: "My Events", path: "/my-events" },
+                          { name: "My Ticket", path: "/my-tickets" },
                         ]
                       : []),
                   ].map((item, index) => (

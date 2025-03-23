@@ -58,7 +58,7 @@ const handleSend = async (e: React.FormEvent<HTMLFormElement>) => {
 
     console.log("user id", user?.id);
 
-    // Ensure balance is a valid number
+
     let formattedBalance = 0;
     if (balance.data?.formatted) {
       try {
