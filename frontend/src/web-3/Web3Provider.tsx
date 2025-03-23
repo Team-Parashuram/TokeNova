@@ -1,13 +1,24 @@
-import { mainnet, sepolia } from "wagmi/chains";
+import { mainnet, sepolia, Chain } from "wagmi/chains";
 import { WagmiProvider, createConfig, http } from "wagmi";
 import { ConnectKitProvider, getDefaultConfig } from "connectkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const hardhat: Chain = {
+  id: 31337,
+  name: "Hardhat",
+  network: "hardhat",
+  nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+  rpcUrls: {
+    default: { http: ["http://127.0.0.1:8545"] },
+    public: { http: ["http://127.0.0.1:8545"] },
+  },
+};
 
 
 const config = createConfig(
   getDefaultConfig({
     // Your dApps chains
-    chains: [mainnet, sepolia],
+    chains: [mainnet, sepolia, hardhat],
     transports: {
       // RPC URL for each chain
       [mainnet.id]: http(
@@ -15,7 +26,8 @@ const config = createConfig(
       ),
       [sepolia.id]: http(
         `https://rpc.ankr.com/eth_sepolia/9815006e2dbfbcc89648b629d222cc0a082815bbf52da5a2570b9db44208a1a9`,
-      )
+      ),
+      [hardhat.id]: http("http://127.0.0.1:8545"), 
     },
 
     // Required API Keys

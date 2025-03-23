@@ -140,7 +140,7 @@ export const getCreatorEvents = async (creatorAddress: string) => {
     const eventAddresses = await eventCreatorContract.getCreatorEvents(
       creatorAddress
     );
-
+    console.log(eventAddresses)
     if (eventAddresses.length === 0) {
       return [];
     }
