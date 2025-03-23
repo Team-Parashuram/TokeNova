@@ -1,7 +1,7 @@
 import axios from "axios";
 import DOMPurify from "dompurify";
 import toast from "react-hot-toast";
-import { Event } from "../Types/Event.Types";
+import { Event } from "../Types/Event.types";
 import { useUserStore } from "@/store/store";
 import { useBalance, useAccount } from "wagmi";
 import { buyTicket, getAllEvents, getEventDetails } from "@/web-3/blockchain";
