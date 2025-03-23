@@ -78,7 +78,6 @@ class EventBookingSession:
            - Make sure tickets are available
            - Get confirmation from the user before finalizing
         4. For booking confirmations, respond with {confirmation: event_id}
-        5. If the booking process is interrupted, respond with {callback: event_id}
         """
         
         # Add the context information to help the model make decisions
