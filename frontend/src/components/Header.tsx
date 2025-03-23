@@ -109,7 +109,6 @@ const Header = () => {
                     {item.name}
                   </motion.span>
 
-                  {/* Underline for both active and hover states */}
                   <AnimatePresence>
                     {isActive(item.path) && (
                       <motion.span
@@ -130,7 +129,6 @@ const Header = () => {
                   )}
                 </motion.a>
 
-                {/* Background highlight for active item */}
                 <AnimatePresence>
                   {isActive(item.path) && (
                     <motion.div
@@ -146,7 +144,6 @@ const Header = () => {
             ))}
           </nav>
 
-          {/* Connect Wallet & Mobile Menu Button */}
           <div className="flex items-center gap-4">
             <motion.div
               whileHover={{ scale: 1.05 }}

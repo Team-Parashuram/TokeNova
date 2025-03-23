@@ -1,12 +1,13 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { MessageCircleCodeIcon, X, Send } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import DOMPurify from "dompurify";
 import toast from "react-hot-toast";
+import { Event } from "../Types/Event.types";
 import { useUserStore } from "@/store/store";
 import { useBalance, useAccount } from "wagmi";
-import { Event } from "../Types/Event.types";
 import { getAllEvents } from "@/web-3/blockchain";
+import { useState, useEffect, useRef } from "react";
+import { MessageCircleCodeIcon, X, Send } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 
 const ChatWithAI = () => {
   const user = useUserStore((state) => state.user);
@@ -56,8 +57,6 @@ const ChatWithAI = () => {
       };
       setMessages((prev) => [...prev, userMessage]);
 
-      console.log("user id", user?.id);
-
       let formattedBalance = 0;
       if (balance.data?.formatted) {
         try {
@@ -82,15 +81,14 @@ const ChatWithAI = () => {
         )
       );
 
-      console.log("Payload:", safePayload);
-
       try {
-        const { data } = await axios.post(
+        const res = await axios.post(
           "http://127.0.0.1:3000/chatbot",
           safePayload
         );
+        const data = res.data;
         const botMessage = {
-          text: data.response.message,
+          text: DOMPurify.sanitize(data.response.message),
           sender: "bot",
           timestamp: new Date().toISOString(),
         };
@@ -157,7 +155,7 @@ const ChatWithAI = () => {
                             : "bg-gray-100 text-gray-800"
                         }`}
                       >
-                        {message.text}
+                        <ReactMarkdown>{message.text}</ReactMarkdown>
                       </div>
                     </div>
                   ))
