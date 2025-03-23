@@ -27,7 +27,7 @@ const App = () => {
             <Route path="/my-tickets" element={<MyTickets />} />
             <Route path="*" element={<Navigate to="/home" replace />} />
           </Routes>
-          <Theme />
+          {/* <Theme /> */}
         </Layout>
       ) : (
         <div>
@@ -35,7 +35,7 @@ const App = () => {
             <Route path="/" element={<LandingPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-          <Theme />
+          {/* <Theme /> */}
         </div>
       )}
     </>
