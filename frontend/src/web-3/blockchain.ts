@@ -10,7 +10,6 @@ const EVENT_CREATOR_CONTRACT_ADDRESS = import.meta.env
   .VITE_EVENT_CREATOR_CONTRACT_ADDRESS;
 const USER_CONTRACT_ADDRESS = import.meta.env.VITE_USER_CONTRACT_ADDRESS;
 const RPC_URL = import.meta.env.VITE_RPC_URL;
-
 if (!EVENT_CREATOR_CONTRACT_ADDRESS || !USER_CONTRACT_ADDRESS || !RPC_URL) {
   throw new Error("Missing required environment variables");
 }
@@ -38,13 +37,13 @@ export const createEvent = async (
 ) => {
   try {
     const signer = await getSigner();
-
+    
     const eventCreatorContract = new ethers.Contract(
       EVENT_CREATOR_CONTRACT_ADDRESS,
       EventCreatorABI.abi,
       signer
     );
-
+    
     const tx = await eventCreatorContract.createEvent(
       numTickets,
       ethers.parseEther(price.toString()),
@@ -56,9 +55,10 @@ export const createEvent = async (
       eventDate,
       eventPlace
     );
-
+    
     await tx.wait();
     console.log("Event created successfully:", tx.hash);
+
     return tx.hash;
   } catch (error) {
     console.error("Error creating event:", error);
@@ -66,19 +66,20 @@ export const createEvent = async (
   }
 };
 
+let tc = 1;
 export const getAllEvents = async () => {
   try {
     const signer = await getSigner();
-
+    
     // EventCreator contract instance
     const eventCreatorContract = new ethers.Contract(
       EVENT_CREATOR_CONTRACT_ADDRESS,
       EventCreatorABI.abi,
       signer
     );
-
+    
     const creators = await eventCreatorContract.getAllCreators();
-
+    
     if (creators.length === 0) {
       return [];
     }
@@ -180,7 +181,7 @@ export const getCreatorEvents = async (creatorAddress: string) => {
 };
 
 //Event
-export const buyTicket = async (eventAddress: string, ticketPrice: number) => {
+export const buyTicket = async (userAddress: string, eventAddress: string, ticketPrice: number) => {
   if (!eventAddress) {
     throw new Error("Event address is required");
   }
@@ -194,6 +195,7 @@ export const buyTicket = async (eventAddress: string, ticketPrice: number) => {
     });
 
     await tx.wait();
+    await addUserTicket(userAddress, eventAddress, tc++);
 
     return tx.hash;
   } catch (error) {
@@ -355,7 +357,6 @@ export const getEventDetails = async (eventAddress: string) => {
 
   try {
     const details = await eventContract.getEventDetails();
-
     return {
       owner: details[0],
       numTickets: Number(details[1]),
@@ -378,7 +379,6 @@ export const addUserTicket = async (
   userAddress: string,
   eventContract: string,
   ticketID: number,
-  userContractAddress: string
 ) => {
   if (!userAddress || !eventContract || ticketID === undefined) {
     throw new Error("Invalid input parameters");
@@ -386,7 +386,7 @@ export const addUserTicket = async (
   const signer = await getSigner();
 
   const userContract = new ethers.Contract(
-    userContractAddress,
+    USER_CONTRACT_ADDRESS,
     UserABI.abi,
     signer
   );
@@ -408,19 +408,16 @@ export const addUserTicket = async (
 };
 
 export const getUserTickets = async (
-  userAddress: string,
-  userContractAddress: string
+  userAddress: string
 ) => {
   if (!userAddress) {
     throw new Error("User address is required");
   }
-
   console.log("Fetching tickets for user:", userAddress);
-  console.log("Using User contract:", userContractAddress);
 
   const signer = await getSigner();
   const userContract = new ethers.Contract(
-    userContractAddress,
+    USER_CONTRACT_ADDRESS,
     UserABI.abi,
     signer
   );
@@ -429,10 +426,7 @@ export const getUserTickets = async (
     const tickets = await userContract.getTickets(userAddress);
     console.log("Raw tickets data:", tickets);
 
-    return tickets.map((ticket: any) => ({
-      eventContract: ticket.eventContract,
-      ticketID: Number(ticket.ticketID),
-    }));
+    return tickets;
   } catch (error) {
     console.error("Error fetching tickets:", error);
     throw new Error("Failed to fetch tickets");

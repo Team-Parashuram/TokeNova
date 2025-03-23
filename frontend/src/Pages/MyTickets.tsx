@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import { getUserTickets, getEventDetails } from "@/web-3/blockchain";
 import { useAccount } from "wagmi";
 
-const USER_CONTRACT_ADDRESS = import.meta.env.VITE_USER_CONTRACT_ADDRESS;
-
 const MyTickets = () => {
   const { address } = useAccount();
   const [tickets, setTickets] = useState([]);
@@ -11,17 +9,17 @@ const MyTickets = () => {
 
   useEffect(() => {
     const fetchTickets = async () => {
-      if (!address || !USER_CONTRACT_ADDRESS) return;
+      if (!address) return;
       
       try {
         setLoading(true);
         // Get the user's tickets
-        const userTickets = await getUserTickets(address, USER_CONTRACT_ADDRESS);
+        const userTickets = await getUserTickets(address);
         console.log(userTickets);
         // Fetch additional event details for each ticket
         const ticketsWithDetails = await Promise.all(
           userTickets.map(async (ticket) => {
-            const eventDetails = await getEventDetails(ticket.eventContract);
+            const eventDetails = await getEventDetails(ticket['eventContract']);
             return {
               id: `${ticket.eventContract}-${ticket.ticketID}`,
               ticketID: ticket.ticketID,

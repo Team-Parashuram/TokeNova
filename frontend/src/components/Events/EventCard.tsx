@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import { Event } from "../Types/Event.types";
-import { deleteEvent } from "@/web-3/blockchain";
-import { useState, useRef, useEffect } from "react";
+import { deleteEvent, setEventStage } from "@/web-3/blockchain";
+import React, { useState, useRef, useEffect } from "react";
+import toast from "react-hot-toast";
 
 interface EventCardProps {
   event: Event;
@@ -53,6 +54,12 @@ const EventCard = ({ event, onEventSelect, onCancelEvent }: EventCardProps) => {
     if (soldPercentage >= 50) return "bg-amber-500";
     return "bg-emerald-500";
   };
+
+  const activateEvent = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    await setEventStage(event.id, 1);
+    toast.success('Event activated successfully');
+  }
 
   return (
     <motion.div
@@ -156,6 +163,12 @@ const EventCard = ({ event, onEventSelect, onCancelEvent }: EventCardProps) => {
                 />
               </svg>
               Cancel Event
+            </button>
+            <button
+              onClick={activateEvent}
+              className="w-full text-left px-4 py-2.5 text-sm text-green-600 hover:bg-gray-50 transition-colors flex items-center"
+            >
+              Activate Event
             </button>
           </div>
         )}

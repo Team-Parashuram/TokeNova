@@ -3,7 +3,8 @@ import { motion } from "framer-motion";
 import { Button } from "../ui/button";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
-import { Event } from "../Types/Event.types";
+import { Event } from "../Types/Event.Types";
+import { useAccount } from "wagmi";
 
 interface EventDetailsModalProps {
   event: Event;
@@ -11,6 +12,7 @@ interface EventDetailsModalProps {
 }
 
 const EventDetailsModal = ({ event, onClose }: EventDetailsModalProps) => {
+  const { address } = useAccount();
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   const handleBuyClick = () => {
@@ -18,8 +20,10 @@ const EventDetailsModal = ({ event, onClose }: EventDetailsModalProps) => {
   };
 
   const handleConfirmBuy = async () => {
+    if (!address) return;
+
     try {
-      const buyData = await buyTicket(event.organizer, event.price);
+      const buyData = await buyTicket(address, event.id, event.price);
       console.log(buyData);
       setShowConfirmation(false);
       toast.success("The ticket has been booked.");

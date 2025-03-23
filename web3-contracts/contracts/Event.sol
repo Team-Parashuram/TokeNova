@@ -134,7 +134,7 @@ contract Event is ERC721, ReentrancyGuard {
         // Mint NFT
         _safeMint(msg.sender, ticketID);
 
-        User(userContract).addTicket(msg.sender, address(this), ticketID);
+        // User(userContract).addTicket(msg.sender, address(this), ticketID);
 
         emit CreateTicket(address(this), name(), msg.sender, ticketID);
     }
