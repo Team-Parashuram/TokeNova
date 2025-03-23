@@ -19,7 +19,6 @@ const ChatWithAI = () => {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [eventId, setEventId] = useState<string | null>(null);
-  const [eventPrice, setEventPrice] = useState<number | null>(null);
   const userAddress = useAccount().address;
 
   useEffect(() => {
