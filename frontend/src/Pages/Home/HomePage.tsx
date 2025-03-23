@@ -7,6 +7,7 @@ import { useUserStore } from "@/store/store";
 import { getAllEvents } from "@/web-3/blockchain";
 import { DEFAULT_EVENT, Event } from "./EventData";
 import EventDetailsModal from "@/components/Events/EventDetailsModal";
+import { describe } from "node:test";
 
 const HomePage = () => {
   const [loading, setLoading] = useState(true);
@@ -28,6 +29,17 @@ const HomePage = () => {
     }
   }, [address, userId, setUser]);
 
+  const getStageText = (stageIndex: number): string => {
+    const stageNames = [
+      "Upcoming",
+      "Active",
+      "Check-in Open",
+      "Cancelled",
+      "Closed",
+    ];
+    return stageNames[stageIndex] ?? "Unknown Stage";
+  };
+
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -41,7 +53,8 @@ const HomePage = () => {
           totalTickets: event.numTickets,
           organizer: event.owner,
           location: event.location,
-          date: event.date
+          date: event.date,
+          description: getStageText(event.stage),
         }));
         setEvents(mappedEvents);
         setCategories([
