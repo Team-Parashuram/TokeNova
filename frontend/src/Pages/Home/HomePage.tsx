@@ -36,7 +36,7 @@ const HomePage = () => {
           ...DEFAULT_EVENT,
           id: event.address,
           name: event.name,
-          price: event.price,
+          price: event.price.toString(),
           ticketsAvailable: event.numTicketsLeft,
           totalTickets: event.numTickets,
           organizer: event.owner,

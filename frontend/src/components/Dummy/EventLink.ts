@@ -1,4 +1,4 @@
-import { Event } from "../Types/Event.Types"
+import { Event } from "../Types/Event.types"
 
 export const events_array: Event[] = [
     {

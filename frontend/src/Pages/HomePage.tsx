@@ -6,8 +6,7 @@ import { v1 as uuidv1 } from "uuid";
 import { useAccount } from "wagmi";
 import { useUserStore } from "@/store/store";
 import EventDetailsModal from "../../src/components/Events/EventDetailsModal"; // Adjust path if necessary
-import { Event } from "@/components/Types/Event.Types";
-
+import { Event } from "@/components/Types/Event.types";
 
 const HomePage = () => {
   const [events, setEvents] = useState<Event[]>([]);
