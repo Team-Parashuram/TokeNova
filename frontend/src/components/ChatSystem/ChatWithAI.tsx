@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { Event } from "../Types/Event.types";
 import { useUserStore } from "@/store/store";
 import { useBalance, useAccount } from "wagmi";
-import { getAllEvents } from "@/web-3/blockchain";
+import { buyTicket, getAllEvents, getEventDetails } from "@/web-3/blockchain";
 import { useState, useEffect, useRef } from "react";
 import { MessageCircleCodeIcon, X, Send } from "lucide-react";
 import ReactMarkdown from "react-markdown";
@@ -18,6 +18,25 @@ const ChatWithAI = () => {
   >([]);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [allEvents, setAllEvents] = useState<Event[]>([]);
+  const [eventId, setEventId] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  
+  useEffect(() => {
+    const handleEventDetails = async () => {
+      const event_data = await getEventDetails(eventId as string);
+      const eventPrice = event_data?.price || 0; // Replace with the correct property for price
+      if (eventId) {
+        await buyTicket(eventId, eventPrice);
+      } else {
+        console.error("Event ID is null");
+      }
+      toast.success("Booking successful!");
+    };
+
+    if (eventId) {
+      handleEventDetails();
+    }
+  }, [eventId]);
 
   useEffect(() => {
     async function getData() {
@@ -39,8 +58,7 @@ const ChatWithAI = () => {
 
   useEffect(() => {
     if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop =
-        messagesContainerRef.current.scrollHeight;
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
   }, [messages]);
 
@@ -86,12 +104,20 @@ const ChatWithAI = () => {
           "http://127.0.0.1:3000/chatbot",
           safePayload
         );
-        const data = res.data;
+
+        if(res.data.response.action === "confirm_booking"){
+          
+          toast.success("Booking confirmed for the event");
+          setEventId(res.data.response.event_id);
+          setModalOpen(true);
+        }
         const botMessage = {
-          text: DOMPurify.sanitize(data.response.message),
+          text: DOMPurify.sanitize(res.data.response.message),
           sender: "bot",
           timestamp: new Date().toISOString(),
         };
+
+
         setMessages((prev) => [...prev, botMessage]);
         toast.success("Message sent to AI");
       } catch (error) {
@@ -105,6 +131,9 @@ const ChatWithAI = () => {
 
   return (
     <div className="relative">
+      {modalOpen && (
+        <h1>Booked</h1>
+      )}
       <div
         className="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md bg-purple-50 text-purple-700 hover:bg-purple-100 transition-colors cursor-pointer"
         onClick={toggleSidebar}
@@ -112,7 +141,6 @@ const ChatWithAI = () => {
         <MessageCircleCodeIcon size={18} />
         <span>Ask AI</span>
       </div>
-
       {open && (
         <div className="fixed inset-0 z-50" onClick={toggleSidebar}>
           <div

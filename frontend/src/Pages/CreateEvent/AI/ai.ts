@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const geminiApiKey = `AIzaSyC8xA5p5MFKOMjJJW02ssEMEMS2ywEdX_Q`;
+const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY as string;
 
 interface AIGeneratedEventData {
     name: string;
