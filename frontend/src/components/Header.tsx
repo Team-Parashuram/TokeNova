@@ -1,12 +1,14 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { ConnectKitButton } from "connectkit";
 import { useAccount } from "wagmi";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import ChatWithAI from "./ChatSystem/ChatWithAI";
+
 
 const Header = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { address } = useAccount();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -34,90 +36,143 @@ const Header = () => {
     setMobileMenuOpen(false);
   };
 
+  // Check if the current route matches the menu item path
+  const isActive = (path: string) => {
+    if (path === "#") return false;
+    return location.pathname === path;
+  };
+
   return (
     <>
       <header
-        className={`fixed w-full top-0 z-50 transition-all duration-300 ${
+        className={`fixed w-full top-0 z-50 transition-all duration-500 ${
           scrolled
-            ? "bg-white/90 backdrop-blur-md shadow-lg border-b border-purple-100"
+            ? "bg-white/95 backdrop-blur-md shadow-md border-b border-purple-200"
             : "bg-transparent"
         }`}
       >
-        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+        <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+          {/* Logo Section */}
           <div
-            className="flex items-center gap-2 cursor-pointer group"
+            className="flex items-center gap-3 cursor-pointer group"
             onClick={() => navigateTo("/")}
           >
-            <div className="flex items-center gap-2 relative">
+            <div className="flex items-center gap-3 relative">
               <motion.div
                 initial={{ rotate: -10 }}
                 animate={{ rotate: 0 }}
-                whileHover={{ scale: 1.05, rotate: -5 }}
-                transition={{ duration: 0.3 }}
+                whileHover={{ scale: 1.1, rotate: -5 }}
+                transition={{ duration: 0.3, type: "spring", stiffness: 300 }}
                 className="relative"
               >
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
-                  <span className="text-white font-bold text-lg">T</span>
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-lg ring-2 ring-purple-300 ring-opacity-30">
+                  <span className="text-white font-bold text-xl">T</span>
                 </div>
-                <div className="absolute -inset-1 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-600/20 blur opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute -inset-1 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-600/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </motion.div>
               <motion.span
-                className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600"
-                whileHover={{ scale: 1.02 }}
+                className="text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500"
+                whileHover={{ scale: 1.03 }}
                 transition={{ duration: 0.2 }}
               >
                 Tokenova
               </motion.span>
             </div>
+            <ChatWithAI />
           </div>
 
-          <nav className="hidden md:flex items-center space-x-8">
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-10">
             {[
-              { name: "Explores", path: "/home" },
+              { name: "Explore", path: "/home" },
               ...(address
                 ? [
                     { name: "Create Event", path: "/create-event" },
                     { name: "My Events", path: "/my-events" },
                   ]
                 : []),
-              { name: "FAQs", path: "#" },
             ].map((item, index) => (
-              <motion.a
-                key={index}
-                onClick={() => navigateTo(item.path)}
-                className="relative text-gray-700 font-medium hover:text-purple-600 transition cursor-pointer px-2 py-1"
-                whileHover={{ y: -2 }}
-                transition={{ duration: 0.2 }}
-              >
-                {item.name}
-                <motion.span
-                  className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-indigo-500 to-purple-600"
-                  whileHover={{ width: "100%" }}
+              <div key={index} className="relative">
+                <motion.a
+                  onClick={() => navigateTo(item.path)}
+                  className="relative font-medium cursor-pointer px-3 py-2 transition-colors z-10"
+                  whileHover={{ y: -2 }}
                   transition={{ duration: 0.2 }}
-                />
-              </motion.a>
+                >
+                  <motion.span
+                    animate={{
+                      color: isActive(item.path) ? "#9333EA" : "#374151",
+                      fontWeight: isActive(item.path) ? 600 : 500,
+                    }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {item.name}
+                  </motion.span>
+
+                  {/* Underline for both active and hover states */}
+                  <AnimatePresence>
+                    {isActive(item.path) && (
+                      <motion.span
+                        className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 rounded-full"
+                        initial={{ width: 0, opacity: 0 }}
+                        animate={{ width: "100%", opacity: 1 }}
+                        transition={{ duration: 0.3, ease: "easeOut" }}
+                      />
+                    )}
+                  </AnimatePresence>
+
+                  {!isActive(item.path) && (
+                    <motion.span
+                      className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 rounded-full"
+                      whileHover={{ width: "100%" }}
+                      transition={{ duration: 0.2 }}
+                    />
+                  )}
+                </motion.a>
+
+                {/* Background highlight for active item */}
+                <AnimatePresence>
+                  {isActive(item.path) && (
+                    <motion.div
+                      className="absolute inset-0 bg-purple-50 rounded-lg z-0"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                    />
+                  )}
+                </AnimatePresence>
+              </div>
             ))}
           </nav>
 
-          <div className="flex items-center gap-3">
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+          {/* Connect Wallet & Mobile Menu Button */}
+          <div className="flex items-center gap-4">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="shadow-md rounded-full shadow-purple-200"
+            >
               <ConnectKitButton
                 customTheme={{
                   "--ck-connectbutton-background":
-                    "linear-gradient(to right, #9333ea, #db2777)",
+                    "linear-gradient(to right, #6366f1, #a855f7, #ec4899)",
                   "--ck-connectbutton-hover-background":
-                    "linear-gradient(to right, #7e22ce, #be185d)",
+                    "linear-gradient(to right, #4f46e5, #9333ea, #db2777)",
                   "--ck-connectbutton-color": "white",
                   "--ck-connectbutton-border-radius": "9999px",
+                  "--ck-connectbutton-font-weight": "600",
+                  "--ck-connectbutton-box-shadow":
+                    "0 4px 12px rgba(168, 85, 247, 0.2)",
                 }}
               />
             </motion.div>
 
-              <ChatWithAI />
             <motion.button
-              className="md:hidden text-gray-700 focus:outline-none"
+              className="md:hidden text-gray-700 focus:outline-none bg-purple-50 p-2 rounded-lg"
               onClick={toggleMobileMenu}
               whileTap={{ scale: 0.9 }}
+              whileHover={{ backgroundColor: "rgba(233, 213, 255, 0.5)" }}
             >
               <svg
                 className="w-6 h-6"
@@ -146,41 +201,88 @@ const Header = () => {
           </div>
         </div>
 
-        {mobileMenuOpen && (
-          <motion.div
-            className="md:hidden bg-white shadow-lg border-t border-purple-100"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className="container mx-auto px-4 py-2">
-              <nav className="flex flex-col space-y-1">
-                {[
-                  { name: "Explores", path: "/home" },
-                  ...(address
-                    ? [
-                        { name: "Create Event", path: "/create-event" },
-                        { name: "My Events", path: "/my-events" },
-                      ]
-                    : []),
-                  { name: "FAQs", path: "#" },
-                ].map((item, index) => (
-                  <motion.a
-                    key={index}
-                    onClick={() => navigateTo(item.path)}
-                    className="text-gray-700 hover:text-purple-600 hover:bg-purple-50 transition cursor-pointer py-3 px-4 rounded-lg"
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    {item.name}
-                  </motion.a>
-                ))}
-              </nav>
-            </div>
-          </motion.div>
-        )}
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              className="md:hidden bg-white shadow-lg border-t border-purple-100"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="container mx-auto px-6 py-3">
+                <nav className="flex flex-col space-y-2">
+                  {[
+                    { name: "Explore", path: "/home" },
+                    ...(address
+                      ? [
+                          { name: "Create Event", path: "/create-event" },
+                          { name: "My Events", path: "/my-events" },
+                        ]
+                      : []),
+                  ].map((item, index) => (
+                    <motion.div
+                      key={index}
+                      className="relative overflow-hidden"
+                      initial={false}
+                    >
+                      <motion.a
+                        onClick={() => navigateTo(item.path)}
+                        className="block py-3 px-4 rounded-lg font-medium z-10 relative"
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <motion.div
+                          animate={{
+                            color: isActive(item.path) ? "#9333EA" : "#374151",
+                            fontWeight: isActive(item.path) ? 600 : 500,
+                            x: isActive(item.path) ? 5 : 0,
+                          }}
+                          transition={{
+                            type: "spring",
+                            stiffness: 300,
+                            damping: 20,
+                          }}
+                        >
+                          {item.name}
+                        </motion.div>
+                      </motion.a>
+
+                      {/* Active background with animation */}
+                      <AnimatePresence>
+                        {isActive(item.path) && (
+                          <motion.div
+                            className="absolute inset-0 bg-purple-50 border-l-4 border-purple-500"
+                            initial={{ x: "-100%", opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            exit={{ x: "-100%", opacity: 0 }}
+                            transition={{
+                              type: "spring",
+                              stiffness: 300,
+                              damping: 30,
+                            }}
+                          />
+                        )}
+                      </AnimatePresence>
+
+                      {/* Hover effect (only for non-active items) */}
+                      {!isActive(item.path) && (
+                        <motion.div
+                          className="absolute inset-0 bg-purple-50/50"
+                          initial={{ opacity: 0 }}
+                          whileHover={{ opacity: 1, x: 5 }}
+                          transition={{ duration: 0.2 }}
+                        />
+                      )}
+                    </motion.div>
+                  ))}
+                </nav>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
-      <div className="h-16"></div>
+      <div className="h-20"></div>{" "}
     </>
   );
 };

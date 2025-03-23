@@ -45,47 +45,68 @@ const ChatWithAI = () => {
 
   const toggleSidebar = () => setOpen(!open);
 
-  const handleSend = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (inputValue.trim()) {
-      const userMessage = {
-        text: inputValue,
-        sender: "user",
+const handleSend = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+
+  if (inputValue.trim()) {
+    const userMessage = {
+      text: inputValue,
+      sender: "user",
+      timestamp: new Date().toISOString(),
+    };
+    setMessages((prev) => [...prev, userMessage]);
+
+    console.log("user id", user?.id);
+
+    // Ensure balance is a valid number
+    let formattedBalance = 0;
+    if (balance.data?.formatted) {
+      try {
+        formattedBalance = Number(balance.data.formatted.replace(/,/g, ""));
+        if (isNaN(formattedBalance)) throw new Error("Invalid number format");
+      } catch (err) {
+        console.error("Error parsing balance:", err);
+        formattedBalance = 0;
+      }
+    }
+
+    const payload = {
+      userId: user?.id || "unknown",
+      balance: formattedBalance,
+      events: allEvents,
+      message: inputValue,
+    };
+
+    const safePayload = JSON.parse(
+      JSON.stringify(payload, (_, value) =>
+        typeof value === "bigint" ? value.toString() : value
+      )
+    );
+
+    console.log("Payload:", safePayload);
+
+    try {
+      const { data } = await axios.post(
+        "http://127.0.0.1:3000/chatbot",
+        safePayload
+      );
+      const botMessage = {
+        text: data.response.message,
+        sender: "bot",
         timestamp: new Date().toISOString(),
       };
-      setMessages((prev) => [...prev, userMessage]);
-
-      console.log("user id", user?.id);
-      const payload = {
-        userId: user?.id || "unknown",
-        balance: balance.data?.formatted
-        ? parseInt(balance.data.formatted.replace(/,/g, ""))
-        : 0,
-        events: allEvents,
-        message: inputValue,
-      };
-      console.log(payload);
-
-      try {
-        const { data } = await axios.post(
-          "http://127.0.0.1:3000/chatbot",
-          payload
-        );
-        const botMessage = {
-          text: data.response.message,
-          sender: "bot",
-          timestamp: new Date().toISOString(),
-        };
-        setMessages((prev) => [...prev, botMessage]);
-        toast.success("Message sent to AI");
-      } catch (error) {
-        console.error("Error sending message to AI:", error);
-        toast.error("Failed to get response from AI");
-      }
-
-      setInputValue("");
+      setMessages((prev) => [...prev, botMessage]);
+      toast.success("Message sent to AI");
+    } catch (error) {
+      console.error("Error sending message to AI:", error);
+      toast.error("Failed to get response from AI");
     }
-  };
+
+    setInputValue("");
+  }
+};
+
+
 
   return (
     <div className="relative">
