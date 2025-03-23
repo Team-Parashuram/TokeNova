@@ -46,7 +46,7 @@ export const createEvent = async (
     
     const tx = await eventCreatorContract.createEvent(
       numTickets,
-      ethers.parseEther(price.toString()),
+      (price.toString()),
       canBeResold,
       royaltyPercent,
       eventName,
@@ -106,7 +106,7 @@ export const getAllEvents = async () => {
               owner: details[0],
               numTickets: Number(details[1]),
               numTicketsLeft: Number(details[2]),
-              price: ethers.formatEther(details[3]), // Convert wei to ether
+              price: (details[3]), // Convert wei to ether
               royaltyPercent: Number(details[4]),
               canBeResold: details[5],
               stage: Number(details[6]),
@@ -134,21 +134,18 @@ export const getCreatorEvents = async (creatorAddress: string) => {
     const eventCreatorContract = new ethers.Contract(
       EVENT_CREATOR_CONTRACT_ADDRESS,
       EventCreatorABI.abi,
-      provider
+      signer
     );
 
     // Fetch events created by this creator
-    const eventAddresses = await eventCreatorContract.getCreatorEvents(
+    const eventAddresse = await eventCreatorContract.getCreatorEvents(
       creatorAddress
     );
-    console.log(eventAddresses);
-    if (eventAddresses.length === 0) {
-      return [];
-    }
+    
 
     // Fetch event details
-    const events = Promise.all(
-      eventAddresses.map(async (eventAddress: string) => {
+    const events = await Promise.all(
+      eventAddresse.map(async (eventAddress: string) => {
         const eventContract = new ethers.Contract(
           eventAddress,
           EventABI.abi,
@@ -160,7 +157,7 @@ export const getCreatorEvents = async (creatorAddress: string) => {
           owner: details[0],
           numTickets: Number(details[1]),
           numTicketsLeft: Number(details[2]),
-          price: ethers.formatEther(details[3]), // Convert wei to ether
+          price: (details[3]), // Convert wei to ether
           royaltyPercent: Number(details[4]),
           canBeResold: details[5],
           stage: Number(details[6]),
@@ -169,7 +166,7 @@ export const getCreatorEvents = async (creatorAddress: string) => {
         };
       })
     );
-
+    console.log(events)
     return events;
   } catch (error) {
     console.error(
@@ -219,7 +216,7 @@ export const buyTicketFromUser = async (
 
   try {
     const tx = await eventContract.buyTicketFromUser(ticketID, {
-      value: ethers.parseEther(resalePrice.toString()),
+      value: (resalePrice.toString()),
     });
 
     await tx.wait();

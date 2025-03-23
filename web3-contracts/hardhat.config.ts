@@ -13,10 +13,10 @@ const config: HardhatUserConfig = {
   defaultNetwork: "localhost",
   networks: {
     hardhat: {},
-    sepolia: {
-      url: API_URL,
-      accounts: [`0x${PRIVATE_KEY}`]
-    }
+    // sepolia: {
+    //   url: API_URL,
+    //   accounts: [`0x${PRIVATE_KEY}`]
+    // }
   },
 };
 

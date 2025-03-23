@@ -148,7 +148,7 @@ const MyTickets = () => {
               
               <div className="mt-6 md:mt-0 flex items-center gap-8">
                 <div className="text-right">
-                  <p className="text-3xl font-bold text-indigo-700">${ticket.total}</p>
+                  <p className="text-3xl font-bold text-indigo-700">ETH {ticket.total}</p>
                   <p className="text-base text-gray-500 mt-1">{ticket.quantity} Ticket{ticket.quantity > 1 ? 's' : ''}</p>
                 </div>
                 
