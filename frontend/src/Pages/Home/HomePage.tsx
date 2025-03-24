@@ -7,7 +7,6 @@ import { useUserStore } from "@/store/store";
 import { getAllEvents } from "@/web-3/blockchain";
 import { DEFAULT_EVENT, Event } from "./EventData";
 import EventDetailsModal from "@/components/Events/EventDetailsModal";
-import { describe } from "node:test";
 
 const HomePage = () => {
   const [loading, setLoading] = useState(true);

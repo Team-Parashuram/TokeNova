@@ -2,9 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ethers } from "ethers";
 
-import EventCreatorABI from "@/../../web3-contracts/artifacts/contracts/EventCreator.sol/EventCreator.json";
-import EventABI from "@/../../web3-contracts/artifacts/contracts/Event.sol/Event.json";
-import UserABI from "@/../../web3-contracts/artifacts/contracts/User.sol/User.json";
+import { EventCreatorABI, EventABI, UserABI } from "@/lib/abi";
 
 const EVENT_CREATOR_CONTRACT_ADDRESS = import.meta.env
   .VITE_EVENT_CREATOR_CONTRACT_ADDRESS;
@@ -40,7 +38,7 @@ export const createEvent = async (
     
     const eventCreatorContract = new ethers.Contract(
       EVENT_CREATOR_CONTRACT_ADDRESS,
-      EventCreatorABI.abi,
+      EventCreatorABI,
       signer
     );
     
@@ -74,7 +72,7 @@ export const getAllEvents = async () => {
     // EventCreator contract instance
     const eventCreatorContract = new ethers.Contract(
       EVENT_CREATOR_CONTRACT_ADDRESS,
-      EventCreatorABI.abi,
+      EventCreatorABI,
       signer
     );
     
@@ -96,7 +94,7 @@ export const getAllEvents = async () => {
           eventAddresses.map(async (eventAddress: string) => {
             const eventContract = new ethers.Contract(
               eventAddress,
-              EventABI.abi,
+              EventABI,
               signer
             );
             const details = await eventContract.getEventDetails();
@@ -133,7 +131,7 @@ export const getCreatorEvents = async (creatorAddress: string) => {
 
     const eventCreatorContract = new ethers.Contract(
       EVENT_CREATOR_CONTRACT_ADDRESS,
-      EventCreatorABI.abi,
+      EventCreatorABI,
       signer
     );
 
@@ -148,7 +146,7 @@ export const getCreatorEvents = async (creatorAddress: string) => {
       eventAddresse.map(async (eventAddress: string) => {
         const eventContract = new ethers.Contract(
           eventAddress,
-          EventABI.abi,
+          EventABI,
           signer
         );
         const details = await eventContract.getEventDetails();
@@ -185,7 +183,7 @@ export const buyTicket = async (userAddress: string, eventAddress: string, ticke
 
   const signer = await getSigner();
 
-  const eventContract = new ethers.Contract(eventAddress, EventABI.abi, signer);
+  const eventContract = new ethers.Contract(eventAddress, EventABI, signer);
   try {
     const tx = await eventContract.buyTicket({
       value: ethers.parseEther(ticketPrice.toString()),
@@ -212,7 +210,7 @@ export const buyTicketFromUser = async (
   const signer = await getSigner();
 
   // Create contract instance
-  const eventContract = new ethers.Contract(eventAddress, EventABI.abi, signer);
+  const eventContract = new ethers.Contract(eventAddress, EventABI, signer);
 
   try {
     const tx = await eventContract.buyTicketFromUser(ticketID, {
@@ -238,7 +236,7 @@ export const setTicketToUsed = async (
   const signer = await getSigner();
 
   // Create contract instance
-  const eventContract = new ethers.Contract(eventAddress, EventABI.abi, signer);
+  const eventContract = new ethers.Contract(eventAddress, EventABI, signer);
 
   try {
     const tx = await eventContract.setTicketToUsed(ticketID);
@@ -264,7 +262,7 @@ export const setTicketForSale = async (
   }
   const signer = await getSigner();
 
-  const eventContract = new ethers.Contract(eventAddress, EventABI.abi, signer);
+  const eventContract = new ethers.Contract(eventAddress, EventABI, signer);
 
   try {
     const tx = await eventContract.setTicketForSale(ticketID, resalePrice);
@@ -283,7 +281,7 @@ export const withdrawFunds = async (eventAddress: string): Promise<string> => {
   }
   const signer = await getSigner();
 
-  const eventContract = new ethers.Contract(eventAddress, EventABI.abi, signer);
+  const eventContract = new ethers.Contract(eventAddress, EventABI, signer);
 
   try {
     const tx = await eventContract.withdraw();
@@ -306,7 +304,7 @@ export const approveBuyer = async (
   }
   const signer = await getSigner();
 
-  const eventContract = new ethers.Contract(eventAddress, EventABI.abi, signer);
+  const eventContract = new ethers.Contract(eventAddress, EventABI, signer);
 
   try {
     const tx = await eventContract.approveAsBuyer(buyer, ticketID);
@@ -328,7 +326,7 @@ export const setEventStage = async (
   }
   const signer = await getSigner();
 
-  const eventContract = new ethers.Contract(eventAddress, EventABI.abi, signer);
+  const eventContract = new ethers.Contract(eventAddress, EventABI, signer);
 
   try {
     const tx = await eventContract.setStage(newStage);
@@ -348,7 +346,7 @@ export const getEventDetails = async (eventAddress: string) => {
 
   const eventContract = new ethers.Contract(
     eventAddress,
-    EventABI.abi,
+    EventABI,
     provider
   );
 
@@ -384,7 +382,7 @@ export const addUserTicket = async (
 
   const userContract = new ethers.Contract(
     USER_CONTRACT_ADDRESS,
-    UserABI.abi,
+    UserABI,
     signer
   );
 
@@ -415,7 +413,7 @@ export const getUserTickets = async (
   const signer = await getSigner();
   const userContract = new ethers.Contract(
     USER_CONTRACT_ADDRESS,
-    UserABI.abi,
+    UserABI,
     signer
   );
 
@@ -434,7 +432,7 @@ export const deleteEvent = async (CONTRACT_ADDRESS: string) => {
   const signer = await getSigner();
   const EventContract = new ethers.Contract(
     CONTRACT_ADDRESS,
-    EventABI.abi,
+    EventABI,
     signer
   );
   try {

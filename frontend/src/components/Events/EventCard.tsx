@@ -136,7 +136,7 @@ const EventCard = ({ event, onEventSelect, onCancelEvent }: EventCardProps) => {
           <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-20 border border-gray-200">
             <button
               onClick={handleCancelClick}
-              className="block w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-gray-50 transition-colors flex items-center"
+              className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-gray-50 transition-colors flex items-center"
             >
               <svg 
                 className="w-4 h-4 mr-2" 

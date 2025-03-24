@@ -43,7 +43,7 @@ const HomePage = () => {
           organizer: event.owner,
           category: "Category not available",
           time: "Time not available",
-          calllback: () => {},
+          callback: () => {},
         }));
         setEvents(mappedEvents);
         const uniqueCategories = [

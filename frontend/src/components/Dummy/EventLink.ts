@@ -14,7 +14,7 @@ export const events_array: Event[] = [
         "imageUrl": "https://via.placeholder.com/800x400",
         "organizer": "0x1234...5678",
         "category": "Tech",
-        "calllback": "bookTicket(124)"
+        "callback": "bookTicket(124)"
     },
     {
         "id": "538",
@@ -29,7 +29,7 @@ export const events_array: Event[] = [
         "imageUrl": "https://via.placeholder.com/800x400",
         "organizer": "0x1234...5678",
         "category": "Tech",
-        "calllback": "bookTicket(538)"
+        "callback": "bookTicket(538)"
     },
     {
         "id": "312",
@@ -44,7 +44,7 @@ export const events_array: Event[] = [
         "imageUrl": "https://via.placeholder.com/800x400",
         "organizer": "0x9876...4321",
         "category": "Tech",
-        "calllback": "bookTicket(312)"
+        "callback": "bookTicket(312)"
     },
     {
         "id": "415",
@@ -59,7 +59,7 @@ export const events_array: Event[] = [
         "imageUrl": "https://via.placeholder.com/800x400",
         "organizer": "0xABCD...1234",
         "category": "Tech",
-        "calllback": "bookTicket(415)"
+        "callback": "bookTicket(415)"
     },
     {
         "id": "527",
@@ -74,6 +74,6 @@ export const events_array: Event[] = [
         "imageUrl": "https://via.placeholder.com/800x400",
         "organizer": "0x5678...9101",
         "category": "Hackathon",
-        "calllback": "bookTicket(527)"
+        "callback": "bookTicket(527)"
     }
 ];

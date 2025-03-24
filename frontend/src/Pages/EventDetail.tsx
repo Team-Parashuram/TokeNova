@@ -28,7 +28,7 @@ const EventDetail = () => {
           imageUrl: "https://via.placeholder.com/800x400",
           organizer: "0x1234...5678",
           category: "Tech",
-          calllback: () => {},
+          callback: () => {},
           time: "10:00 AM",
         };
         setEvent(mockEvent);

@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Button } from "../ui/button";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
-import { Event } from "../Types/Event.Types";
+import { Event } from "../Types/Event.types";
 import { useAccount } from "wagmi";
 
 interface EventDetailsModalProps {

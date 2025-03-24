@@ -1,5 +1,3 @@
-import React from "react";
-
 const TechSection = () => {
   const technologies = [
     { name: "Ethereum", icon: "🔷" },

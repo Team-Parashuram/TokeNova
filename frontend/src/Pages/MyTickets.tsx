@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { getUserTickets, getEventDetails } from "@/web-3/blockchain";
 import { useAccount } from "wagmi";
 import { motion } from "framer-motion";
 import { Calendar, MapPin, Ticket } from "lucide-react";
+import { Ticket as TicketType } from "@/components/Types/User.types";
 
 const MyTickets = () => {
   const { address } = useAccount();
-  const [tickets, setTickets] = useState([]);
+  const [tickets, setTickets] = useState<TicketType[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -20,7 +21,7 @@ const MyTickets = () => {
         console.log(userTickets);
         // Fetch additional event details for each ticket
         const ticketsWithDetails = await Promise.all(
-          userTickets.map(async (ticket) => {
+          userTickets.map(async (ticket: TicketType) => {
             const eventDetails = await getEventDetails(ticket.eventContract);
             return {
               id: `${ticket.eventContract}-${ticket.ticketID}`,

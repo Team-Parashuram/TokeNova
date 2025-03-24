@@ -30,7 +30,7 @@ export const generateEventDetails = async (prompt: string): Promise<AIGeneratedE
   organizer: string;
   category: string;
   time: string;
-  calllback: () => void; this is interface in typescript can you fill that accordinly.The category must be one of: Tech, Music, Art, Sports, Business, Education, Other. Return the response as a plain JSON object with keys "name", "description", and "category", without any additional text or code blocks.`
+  callback: () => void; this is interface in typescript can you fill that accordinly.The category must be one of: Tech, Music, Art, Sports, Business, Education, Other. Return the response as a plain JSON object with keys "name", "description", and "category", without any additional text or code blocks.`
                             }
                         ]
                     }

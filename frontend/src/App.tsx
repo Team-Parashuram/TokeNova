@@ -6,7 +6,6 @@ import {
   LandingPage,
   CreateEvent,
 } from "./Pages";
-import Theme from "./store/ThemeStore";
 import Layout from "./components/Layout";
 import { Routes, Route, Navigate } from "react-router-dom";
 

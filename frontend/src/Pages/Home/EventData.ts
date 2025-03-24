@@ -13,7 +13,7 @@ export const DEFAULT_EVENT: Event = {
   organizer: "Unknown",
   category: "Category not available",
   time: "Time not available",
-  calllback: () => {},
+  callback: () => {},
 };
 
 export type {

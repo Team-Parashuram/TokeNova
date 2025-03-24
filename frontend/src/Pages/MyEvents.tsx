@@ -38,7 +38,7 @@ const MyEvents = () => {
           imageUrl: "https://via.placeholder.com/500",
           organizer: event.owner,
           category: "Uncategorized",
-          calllback: () => {},
+          callback: () => {},
         }));
         setEvents(adaptedEvents);
         setLoading(false);
