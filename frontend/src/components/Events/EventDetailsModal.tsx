@@ -138,7 +138,7 @@ const EventDetailsModal = ({ event, onClose }: EventDetailsModalProps) => {
           <div className="relative mt-6">
             <Button
               onClick={handleBuyClick}
-              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+              className="cursor-pointer w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
             >
               Buy Ticket
             </Button>
@@ -148,7 +148,7 @@ const EventDetailsModal = ({ event, onClose }: EventDetailsModalProps) => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
-                className="absolute top-full mt-4 left-0 right-0 bg-white rounded-xl shadow-xl p-4 border border-gray-100 z-10"
+                className="absolute -top-40 mt-4 left-0 right-0 bg-white rounded-xl shadow-xl p-4 border border-gray-100 z-10"
               >
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">Confirm Purchase</h3>
                 <p className="text-gray-600 mb-4">Are you sure you want to buy this ticket?</p>

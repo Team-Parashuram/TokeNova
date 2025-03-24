@@ -44,7 +44,7 @@ export const createEvent = async (
     
     const tx = await eventCreatorContract.createEvent(
       numTickets,
-      (price.toString()),
+      ethers.parseEther(price.toString()),
       canBeResold,
       royaltyPercent,
       eventName,
