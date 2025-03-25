@@ -140,7 +140,7 @@ export const getCreatorEvents = async (creatorAddress: string) => {
 export const buyTicket = async (
   userAddress: string,
   eventAddress: string,
-  ticketPrice: number
+  ticketPrice: string
 ) => {
   if (!eventAddress) {
     throw new Error("Event address is required");

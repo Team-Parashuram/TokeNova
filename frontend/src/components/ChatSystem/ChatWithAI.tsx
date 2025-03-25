@@ -9,6 +9,8 @@ import { useState, useEffect, useRef } from "react";
 import { MessageCircleCodeIcon, X, Send } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
+const VITE_CHATBOT_URL = import.meta.env.VITE_CHATBOT_URL;
+
 const ChatWithAI = () => {
   const user = useUserStore((state) => state.user);
   const [open, setOpen] = useState(false);
@@ -87,16 +89,13 @@ const ChatWithAI = () => {
       );
 
       try {
-        const res = await axios.post(
-          "http://127.0.0.1:3000/chatbot",
-          safePayload
-        );
+        const res = await axios.post(VITE_CHATBOT_URL, safePayload);
 
-        if(res.data.response.action === "confirm_booking"){
+        if (res.data.response.action === "confirm_booking") {
           toast.success("Booking confirmed for the event");
           setEventId(res.data.response.event_id);
-          const ans = getEventDetails(res.data.response.event_id);
-          buyTicket(userAddress!,eventId!, (await ans).price);
+          const ans = await getEventDetails(res.data.response.event_id);
+          buyTicket(userAddress!, eventId!, ans.price);
         }
         const botMessage = {
           text: DOMPurify.sanitize(res.data.response.message),
@@ -154,18 +153,16 @@ const ChatWithAI = () => {
                   messages.map((message, index) => (
                     <div
                       key={index}
-                      className={`flex ${
-                        message.sender === "user"
+                      className={`flex ${message.sender === "user"
                           ? "justify-end"
                           : "justify-start"
-                      }`}
+                        }`}
                     >
                       <div
-                        className={`max-w-3/4 p-3 rounded-lg ${
-                          message.sender === "user"
+                        className={`max-w-3/4 p-3 rounded-lg ${message.sender === "user"
                             ? "bg-purple-100 text-purple-900"
                             : "bg-gray-100 text-gray-800"
-                        }`}
+                          }`}
                       >
                         <ReactMarkdown>{message.text}</ReactMarkdown>
                       </div>
