@@ -5,7 +5,7 @@ import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { Event } from "../Types/Event.types";
 import { useAccount } from "wagmi";
-import { Calendar, MapPin, Clock, Ticket, Users, Wallet, CheckCircle, XCircle, Archive  } from "lucide-react";
+import { Calendar, MapPin, Clock, Ticket, Users, Wallet, CheckCircle, XCircle, Archive } from "lucide-react";
 
 
 interface EventDetailsModalProps {
@@ -78,7 +78,7 @@ const EventDetailsModal = ({ event, onClose }: EventDetailsModalProps) => {
 
   return (
     <motion.div
-      className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50"
+      className="fixed inset-0 backdrop-brightness-50 flex items-center justify-center z-50"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -134,7 +134,11 @@ const EventDetailsModal = ({ event, onClose }: EventDetailsModalProps) => {
               <Calendar className="w-5 h-5 text-indigo-500" />
               <div>
                 <p className="text-sm text-gray-500">Date</p>
-                <p className="text-gray-800 font-medium">{event.date}</p>
+                <p className="text-gray-800 font-medium">{new Date(Number(event.date)).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -148,7 +152,7 @@ const EventDetailsModal = ({ event, onClose }: EventDetailsModalProps) => {
               <Clock className="w-5 h-5 text-indigo-500" />
               <div>
                 <p className="text-sm text-gray-500">Time</p>
-                <p className="text-gray-800 font-medium">{event.time}</p>
+                <p className="text-gray-800 font-medium">{"TBD"}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -169,9 +173,9 @@ const EventDetailsModal = ({ event, onClose }: EventDetailsModalProps) => {
             </div>
             <div className="flex items-center gap-3">
               <Users className="w-5 h-5 text-indigo-500" />
-              <div>
+              <div className="w-full">
                 <p className="text-sm text-gray-500">Organizer</p>
-                <p className="text-gray-800 font-medium">{event.organizer}</p>
+                <p className="text-gray-800 font-medium truncate">{event.organizer}</p>
               </div>
             </div>
           </div>
