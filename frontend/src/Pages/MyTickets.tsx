@@ -4,13 +4,13 @@ import { useAccount } from "wagmi";
 import { motion } from "framer-motion";
 import { Calendar, MapPin, Ticket } from "lucide-react";
 import { Ticket as TicketType } from "@/components/Types/User.types";
-import { QRCodeSVG } from "qrcode.react"; 
+import { QRCodeSVG } from "qrcode.react";
 
 const MyTickets = () => {
   const { address } = useAccount();
   const [tickets, setTickets] = useState<TicketType[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showQRFor, setShowQRFor] = useState<string | null>(null); 
+  const [showQRFor, setShowQRFor] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -30,7 +30,7 @@ const MyTickets = () => {
               eventDate: new Date().getTime(),
               eventLocation: eventDetails.location,
               total: eventDetails.price,
-              quantity: 1, // Assuming each ticket is for 1 person
+              quantity: 1,
             };
           })
         );
@@ -93,7 +93,7 @@ const MyTickets = () => {
           </div>
           <h2 className="text-2xl font-bold text-gray-800">No Tickets Found</h2>
           <p className="text-gray-600 mt-2 max-w-md">
-            You don&apos;t have any tickets yet. Browse events and secure your spot!
+            You don't have any tickets yet. Browse events and secure your spot!
           </p>
         </motion.div>
       </div>
@@ -122,7 +122,7 @@ const MyTickets = () => {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.4, delay: index * 0.1 }}
             whileHover={{ scale: 1.02 }}
-            className="group relative bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300"
+            className="group relative bg-white rounded-2xl shadow-md hover:shadow-lg transition-all duration-300"
           >
             <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 to-purple-500" />
             <div className="absolute -right-8 -top-8 w-24 h-24 bg-purple-100 rounded-full opacity-50" />
@@ -175,24 +175,27 @@ const MyTickets = () => {
                   <Ticket size={24} className="text-indigo-600" />
                 </motion.div>
 
-                {/* Generate QR Button */}
-                <button
-                  onClick={() =>
-                    setShowQRFor(showQRFor === ticket.id ? null : ticket.id)
-                  }
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-                >
-                  {showQRFor === ticket.id ? "Hide QR" : "Generate QR"}
-                </button>
+                {/* Generate QR Button with Tooltip */}
+                <div className="relative">
+                  <button
+                    onClick={() =>
+                      setShowQRFor(showQRFor === ticket.id ? null : ticket.id)
+                    }
+                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                  >
+                    {showQRFor === ticket.id ? "Hide QR" : "Generate QR"}
+                  </button>
+                  {showQRFor === ticket.id && (
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 p-4 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+                      <QRCodeSVG
+                        value={`${ticket.eventContract}-${ticket.ticketID}-${address}`}
+                        size={150}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-
-            {/* QR Code Display */}
-            {showQRFor === ticket.id && (
-              <div className="mt-4 p-4 bg-gray-50 rounded-lg flex justify-center">
-                <QRCodeSVG value={ticket.eventContract} size={200} />
-              </div>
-            )}
           </motion.li>
         ))}
       </ul>
