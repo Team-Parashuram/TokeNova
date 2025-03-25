@@ -71,7 +71,6 @@ const ChatWithAI = () => {
           formattedBalance = 0;
         }
       }
-      console.log('h')
 
       const payload = {
         userId: user?.id || "unknown",

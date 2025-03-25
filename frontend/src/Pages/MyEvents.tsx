@@ -22,7 +22,6 @@ const MyEvents = () => {
 
     const fetchMyEvents = async () => {
       try {
-        console.log(address, "asfsvgswf")
 
         const blockchainEvents = await getCreatorEvents(address);
         const adaptedEvents: Event[] = blockchainEvents.map((event) => ({

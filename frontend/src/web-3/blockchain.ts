@@ -35,13 +35,13 @@ export const createEvent = async (
 ) => {
   try {
     const signer = await getSigner();
-    
+
     const eventCreatorContract = new ethers.Contract(
       EVENT_CREATOR_CONTRACT_ADDRESS,
       EventCreatorABI,
       signer
     );
-    
+
     const tx = await eventCreatorContract.createEvent(
       numTickets,
       ethers.parseEther(price.toString()),
@@ -53,7 +53,7 @@ export const createEvent = async (
       eventDate,
       eventPlace
     );
-    
+
     await tx.wait();
     console.log("Event created successfully:", tx.hash);
 
@@ -68,16 +68,16 @@ let tc = 1;
 export const getAllEvents = async () => {
   try {
     const signer = await getSigner();
-    
+
     // EventCreator contract instance
     const eventCreatorContract = new ethers.Contract(
       EVENT_CREATOR_CONTRACT_ADDRESS,
       EventCreatorABI,
       signer
     );
-    
+
     const creators = await eventCreatorContract.getAllCreators();
-    
+
     if (creators.length === 0) {
       return [];
     }
@@ -92,27 +92,7 @@ export const getAllEvents = async () => {
         // Fetch details for each event
         return Promise.all(
           eventAddresses.map(async (eventAddress: string) => {
-            const eventContract = new ethers.Contract(
-              eventAddress,
-              EventABI,
-              signer
-            );
-            const details = await eventContract.getEventDetails();
-            // console.log(details)
-            return {
-              address: eventAddress,
-              owner: details[0],
-              numTickets: Number(details[1]),
-              numTicketsLeft: Number(details[2]),
-              price: ethers.formatEther(details[3]), // Convert wei to ether
-              royaltyPercent: Number(details[4]),
-              canBeResold: details[5],
-              stage: Number(details[6]),
-              name: details[7],
-              symbol: details[8],
-              date: details[9],
-              location: details[10],
-            };
+            return await getEventDetails(eventAddress);
           })
         );
       })
@@ -139,32 +119,13 @@ export const getCreatorEvents = async (creatorAddress: string) => {
     const eventAddresse = await eventCreatorContract.getCreatorEvents(
       creatorAddress
     );
-    
 
     // Fetch event details
     const events = await Promise.all(
       eventAddresse.map(async (eventAddress: string) => {
-        const eventContract = new ethers.Contract(
-          eventAddress,
-          EventABI,
-          signer
-        );
-        const details = await eventContract.getEventDetails();
-        return {
-          address: eventAddress,
-          owner: details[0],
-          numTickets: Number(details[1]),
-          numTicketsLeft: Number(details[2]),
-          price: (details[3]), // Convert wei to ether
-          royaltyPercent: Number(details[4]),
-          canBeResold: details[5],
-          stage: Number(details[6]),
-          name: details[7],
-          symbol: details[8],
-        };
+        return await getEventDetails(eventAddress);
       })
     );
-    console.log(events)
     return events;
   } catch (error) {
     console.error(
@@ -176,7 +137,11 @@ export const getCreatorEvents = async (creatorAddress: string) => {
 };
 
 //Event
-export const buyTicket = async (userAddress: string, eventAddress: string, ticketPrice: number) => {
+export const buyTicket = async (
+  userAddress: string,
+  eventAddress: string,
+  ticketPrice: number
+) => {
   if (!eventAddress) {
     throw new Error("Event address is required");
   }
@@ -186,7 +151,7 @@ export const buyTicket = async (userAddress: string, eventAddress: string, ticke
   const eventContract = new ethers.Contract(eventAddress, EventABI, signer);
   try {
     const tx = await eventContract.buyTicket({
-      value: ticketPrice,
+      value: ethers.parseEther(ticketPrice.toString()),
     });
 
     await tx.wait();
@@ -214,7 +179,7 @@ export const buyTicketFromUser = async (
 
   try {
     const tx = await eventContract.buyTicketFromUser(ticketID, {
-      value: (resalePrice.toString()),
+      value: resalePrice.toString(),
     });
 
     await tx.wait();
@@ -344,24 +309,23 @@ export const getEventDetails = async (eventAddress: string) => {
     throw new Error("Event address is required");
   }
 
-  const eventContract = new ethers.Contract(
-    eventAddress,
-    EventABI,
-    provider
-  );
+  const eventContract = new ethers.Contract(eventAddress, EventABI, provider);
 
   try {
     const details = await eventContract.getEventDetails();
     return {
+      address: eventAddress,
       owner: details[0],
       numTickets: Number(details[1]),
       numTicketsLeft: Number(details[2]),
-      price: ethers.formatEther(details[3]),
+      price: ethers.formatEther(details[3]), // Convert wei to ether
       royaltyPercent: Number(details[4]),
       canBeResold: details[5],
-      stage: Number(details[6]), // Enum value
+      stage: Number(details[6]),
       name: details[7],
       symbol: details[8],
+      date: details[9],
+      location: details[10],
     };
   } catch (error) {
     console.error("Error fetching event details:", error);
@@ -373,7 +337,7 @@ export const getEventDetails = async (eventAddress: string) => {
 export const addUserTicket = async (
   userAddress: string,
   eventContract: string,
-  ticketID: number,
+  ticketID: number
 ) => {
   if (!userAddress || !eventContract || ticketID === undefined) {
     throw new Error("Invalid input parameters");
@@ -402,13 +366,10 @@ export const addUserTicket = async (
   }
 };
 
-export const getUserTickets = async (
-  userAddress: string
-) => {
+export const getUserTickets = async (userAddress: string) => {
   if (!userAddress) {
     throw new Error("User address is required");
   }
-  console.log("Fetching tickets for user:", userAddress);
 
   const signer = await getSigner();
   const userContract = new ethers.Contract(
@@ -419,7 +380,6 @@ export const getUserTickets = async (
 
   try {
     const tickets = await userContract.getTickets(userAddress);
-    console.log("Raw tickets data:", tickets);
 
     return tickets;
   } catch (error) {
@@ -430,11 +390,7 @@ export const getUserTickets = async (
 
 export const deleteEvent = async (CONTRACT_ADDRESS: string) => {
   const signer = await getSigner();
-  const EventContract = new ethers.Contract(
-    CONTRACT_ADDRESS,
-    EventABI,
-    signer
-  );
+  const EventContract = new ethers.Contract(CONTRACT_ADDRESS, EventABI, signer);
   try {
     const tx = await EventContract.setStage(3);
 

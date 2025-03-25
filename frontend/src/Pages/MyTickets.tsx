@@ -18,10 +18,7 @@ const MyTickets = () => {
 
       try {
         setLoading(true);
-        // Get the user's tickets
         const userTickets = await getUserTickets(address);
-        console.log(userTickets);
-        // Fetch additional event details for each ticket
         const ticketsWithDetails = await Promise.all(
           userTickets.map(async (ticket: TicketType) => {
             const eventDetails = await getEventDetails(ticket.eventContract);
@@ -30,8 +27,8 @@ const MyTickets = () => {
               ticketID: ticket.ticketID,
               eventContract: ticket.eventContract,
               eventName: eventDetails.name,
-              eventDate: new Date().getTime(), // Placeholder; replace with actual event date
-              eventLocation: "Event Location", // Placeholder; replace with actual event location
+              eventDate: new Date().getTime(),
+              eventLocation: eventDetails.location,
               total: eventDetails.price,
               quantity: 1, // Assuming each ticket is for 1 person
             };
