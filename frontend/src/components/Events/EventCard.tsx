@@ -43,9 +43,15 @@ const EventCard = ({ event, onEventSelect, onCancelEvent }: EventCardProps) => {
   const handleCancelClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (window.confirm("Are you sure you want to cancel this event?")) {
-      await deleteEvent(event.id);
-      if (onCancelEvent) {
-        onCancelEvent(event);
+      try {
+        await deleteEvent(event.id);
+        if (onCancelEvent) {
+          onCancelEvent(event);
+        }
+        toast.success("Event cancelled successfully");
+        window.location.href = '/'
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : 'Cannot activate this event');
       }
     }
     setMenuOpen(false);
@@ -87,14 +93,17 @@ const EventCard = ({ event, onEventSelect, onCancelEvent }: EventCardProps) => {
 
   const activateEvent = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    await setEventStage(event.id, 1);
-    toast.success("Event activated successfully");
+    try {
+      await setEventStage(event.id, 1);
+      toast.success("Event activated successfully");
+      window.location.href = '/';
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Cannot activate this event');
+    }
   };
 
   const statusColors = getStatusColor();
 
-
-  
   return (
     <motion.div
       onClick={() => onEventSelect(event)}
