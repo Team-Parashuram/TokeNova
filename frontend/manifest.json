@@ -1,0 +1,18 @@
+{
+    "name": "TokeNova",
+    "short_name": "TokeNova",
+    "theme_color": "#111",
+    "background_color": "#212121",
+    "display": "standalone",
+    "display_override": ["fullscreen", "standalone"],
+    "scope": "/",
+    "start_url": "/",
+    "description": "A NFT-based Event Ticketing Platform",
+    "orientation": "any",
+    "icons": [
+        {
+            "src": "https://tokenova.vercel.app/Logo/PNG/main-logo.png",
+            "sizes": "1024x1024"
+        }
+    ]
+}
