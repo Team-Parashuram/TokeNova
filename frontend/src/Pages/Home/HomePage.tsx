@@ -7,6 +7,7 @@ import { useUserStore } from "@/store/store";
 import { getAllEvents } from "@/web-3/blockchain";
 import { DEFAULT_EVENT, Event } from "./EventData";
 import EventDetailsModal from "@/components/Events/EventDetailsModal";
+import { getStageText } from "@/lib/utils";
 
 const HomePage = () => {
   const [loading, setLoading] = useState(true);
@@ -27,17 +28,6 @@ const HomePage = () => {
       setUser({ id: newId });
     }
   }, [address, userId, setUser]);
-
-  const getStageText = (stageIndex: number): string => {
-    const stageNames = [
-      "Upcoming",
-      "Active",
-      "Check-in Open",
-      "Cancelled",
-      "Closed",
-    ];
-    return stageNames[stageIndex] ?? "Unknown Stage";
-  };
 
   useEffect(() => {
     const fetchEvents = async () => {

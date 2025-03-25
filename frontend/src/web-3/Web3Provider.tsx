@@ -26,7 +26,7 @@ const config = createConfig(
         `https://rpc.ankr.com/eth/9815006e2dbfbcc89648b629d222cc0a082815bbf52da5a2570b9db44208a1a9`,
       ),
       [sepolia.id]: http(
-        `https://rpc.ankr.com/eth_sepolia/9815006e2dbfbcc89648b629d222cc0a082815bbf52da5a2570b9db44208a1a9`,
+        import.meta.env.VITE_RPC_URL,
       ),
       [hardhat.id]: http(import.meta.env.VITE_RPC_URL), 
     },
