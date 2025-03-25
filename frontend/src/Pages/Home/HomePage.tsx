@@ -54,6 +54,7 @@ const HomePage = () => {
           location: event.location,
           date: event.date,
           description: getStageText(event.stage),
+          imageUrl: event.imageUrl
         }));
         setEvents(mappedEvents);
         setCategories([
