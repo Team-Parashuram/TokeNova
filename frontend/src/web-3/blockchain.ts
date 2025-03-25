@@ -18,8 +18,11 @@ const getSigner = async () => {
   if (!window.ethereum) {
     throw new Error("No Web3 provider found");
   }
-  const provider = new ethers.JsonRpcProvider(RPC_URL);
-  return await provider.getSigner(0);
+
+  const provider = new ethers.BrowserProvider(window.ethereum);
+  const signer = await provider.getSigner();
+
+  return signer;
 };
 
 //EventCreator
