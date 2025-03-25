@@ -9,7 +9,7 @@ import { useState, useEffect, useRef } from "react";
 import { MessageCircleCodeIcon, X, Send } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
-const VITE_CHATBOT_URL = import.meta.env.VITE_CHATBOT_URL;
+const VITE_PY_URL = import.meta.env.VITE_CHATBOT_URL;
 
 const ChatWithAI = () => {
   const user = useUserStore((state) => state.user);
@@ -89,7 +89,7 @@ const ChatWithAI = () => {
       );
 
       try {
-        const res = await axios.post(VITE_CHATBOT_URL, safePayload);
+        const res = await axios.post(VITE_PY_URL, safePayload);
 
         if (res.data.response.action === "confirm_booking") {
           toast.success("Booking confirmed for the event");
