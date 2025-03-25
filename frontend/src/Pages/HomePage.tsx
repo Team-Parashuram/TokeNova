@@ -44,7 +44,7 @@ const HomePage = () => {
             totalTickets: event.numTickets,
             imageUrl: event.imageUrl,
             organizer: event.owner,
-            category: "Category not available",
+            category: "More categories",
             time: event.time,
             callback: () => {},
           })
@@ -162,7 +162,7 @@ const HomePage = () => {
         </div>
 
         <div className="flex flex-wrap justify-center gap-3 mb-12">
-          {categories.map((category) => (
+          {/* {categories.map((category) => (
             <motion.button
               key={category}
               onClick={() => setSelectedCategory(category)}
@@ -176,7 +176,7 @@ const HomePage = () => {
             >
               {category}
             </motion.button>
-          ))}
+          ))} */}
         </div>
 
         {loading ? (

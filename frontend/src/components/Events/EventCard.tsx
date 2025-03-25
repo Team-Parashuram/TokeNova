@@ -118,11 +118,11 @@ const EventCard = ({ event, onEventSelect, onCancelEvent }: EventCardProps) => {
           />
         </div>
         {/* Category badge - repositioned */}
-        <div className="absolute top-4 left-4 z-20">
+        {/* <div className="absolute top-4 left-4 z-20">
           <span className="bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-semibold text-indigo-700 shadow-sm border border-indigo-100">
             {event.category}
           </span>
-        </div>
+        </div> */}
 
         {/* Date badge - new */}
         <div className="absolute bottom-4 left-4 z-20">
