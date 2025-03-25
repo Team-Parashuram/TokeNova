@@ -5,14 +5,13 @@ import { useAccount } from "wagmi";
 import { motion, AnimatePresence } from "framer-motion";
 import ChatWithAI from "./ChatSystem/ChatWithAI";
 
-
 const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { address } = useAccount();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+ const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
     const handleScroll = () => {
       const isScrolled = window.scrollY > 20;
@@ -21,9 +20,17 @@ const Header = () => {
       }
     };
 
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    handleResize();
     window.addEventListener("scroll", handleScroll);
+    window.addEventListener("resize", handleResize);
+
     return () => {
       window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleResize);
     };
   }, [scrolled]);
 
@@ -36,12 +43,10 @@ const Header = () => {
     setMobileMenuOpen(false);
   };
 
-  // Check if the current route matches the menu item path
   const isActive = (path: string) => {
     if (path === "#") return false;
     return location.pathname === path;
   };
-
   return (
     <>
       <header
@@ -51,13 +56,13 @@ const Header = () => {
             : "bg-transparent"
         }`}
       >
-        <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-          {/* Logo Section */}
+        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
+
           <div
-            className="flex items-center gap-3 cursor-pointer group"
+            className="flex items-center gap-2 sm:gap-3 cursor-pointer group"
             onClick={() => navigateTo("/")}
           >
-            <div className="flex items-center gap-3 relative">
+            <div className="flex items-center gap-2 sm:gap-3 relative">
               <motion.div
                 initial={{ rotate: -10 }}
                 animate={{ rotate: 0 }}
@@ -65,18 +70,22 @@ const Header = () => {
                 transition={{ duration: 0.3, type: "spring", stiffness: 300 }}
                 className="relative"
               >
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-lg ring-2 ring-purple-300 ring-opacity-30">
-                  <span className="text-white font-bold text-xl">T</span>
+                <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-lg ring-2 ring-purple-300 ring-opacity-30">
+                  <span className="text-white font-bold text-base sm:text-xl">
+                    T
+                  </span>
                 </div>
                 <div className="absolute -inset-1 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-600/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </motion.div>
-              <motion.span
-                className="text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500"
-                whileHover={{ scale: 1.03 }}
-                transition={{ duration: 0.2 }}
-              >
-                Tokenova
-              </motion.span>
+              {!isMobile && (
+                <motion.span
+                  className="text-xl sm:text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500"
+                  whileHover={{ scale: 1.03 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  Tokenova
+                </motion.span>
+              )}
             </div>
             <ChatWithAI />
           </div>
@@ -144,11 +153,11 @@ const Header = () => {
             ))}
           </nav>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="shadow-md rounded-full shadow-purple-200"
+              className="shadow-md rounded-full shadow-purple-200 scale-75 sm:scale-100"
             >
               <ConnectKitButton
                 customTheme={{
@@ -172,7 +181,7 @@ const Header = () => {
               whileHover={{ backgroundColor: "rgba(233, 213, 255, 0.5)" }}
             >
               <svg
-                className="w-6 h-6"
+                className="w-5 h-5 sm:w-6 sm:h-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -198,7 +207,7 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Mobile Menu */}
+
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
@@ -208,8 +217,8 @@ const Header = () => {
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="container mx-auto px-6 py-3">
-                <nav className="flex flex-col space-y-2">
+              <div className="container mx-auto px-4 sm:px-6 py-3">
+                <nav className="flex flex-col space-y-1 sm:space-y-2">
                   {[
                     { name: "Explore", path: "/home" },
                     ...(address
@@ -227,7 +236,7 @@ const Header = () => {
                     >
                       <motion.a
                         onClick={() => navigateTo(item.path)}
-                        className="block py-3 px-4 rounded-lg font-medium z-10 relative"
+                        className="block py-2 sm:py-3 px-3 sm:px-4 rounded-lg font-medium z-10 relative"
                         whileTap={{ scale: 0.98 }}
                       >
                         <motion.div
@@ -246,7 +255,7 @@ const Header = () => {
                         </motion.div>
                       </motion.a>
 
-                      {/* Active background with animation */}
+        
                       <AnimatePresence>
                         {isActive(item.path) && (
                           <motion.div
@@ -263,7 +272,7 @@ const Header = () => {
                         )}
                       </AnimatePresence>
 
-                      {/* Hover effect (only for non-active items) */}
+      
                       {!isActive(item.path) && (
                         <motion.div
                           className="absolute inset-0 bg-purple-50/50"
@@ -280,7 +289,7 @@ const Header = () => {
           )}
         </AnimatePresence>
       </header>
-      <div className="h-20"></div>{" "}
+      <div className="h-16 sm:h-20"></div>
     </>
   );
 };

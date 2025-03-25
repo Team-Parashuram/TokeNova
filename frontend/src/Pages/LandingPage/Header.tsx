@@ -57,7 +57,6 @@ const Header = () => {
             </motion.span>
           </motion.div>
 
-          {/* Navigation with enhanced hover effects */}
           <nav className="hidden md:flex items-center space-x-8">
             {["Features", "FAQ"].map((item) => (
               <motion.a
