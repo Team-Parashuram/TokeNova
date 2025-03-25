@@ -75,7 +75,9 @@ const EventCard = ({ event, onEventSelect, onCancelEvent }: EventCardProps) => {
     >
       {/* Image container with gradient overlay */}
       <div className="relative h-52 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent z-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent z-10" >
+            
+        </div>
         
         {/* Category badge - repositioned */}
         <div className="absolute top-4 left-4 z-20">

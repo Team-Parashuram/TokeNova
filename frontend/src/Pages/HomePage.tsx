@@ -39,7 +39,7 @@ const HomePage = () => {
           price: event.price,
           ticketsAvailable: event.numTicketsLeft,
           totalTickets: event.numTickets,
-          imageUrl: "https://via.placeholder.com/500",
+          imageUrl: event.imageUrl,
           organizer: event.owner,
           category: "Category not available",
           time: "Time not available",

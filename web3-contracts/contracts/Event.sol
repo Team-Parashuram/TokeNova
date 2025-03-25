@@ -54,6 +54,8 @@ contract Event is ERC721, ReentrancyGuard {
     uint256 public eventDate;
     string public eventPlace;
 
+    string public imageUrl;
+
     // to store the balances for buyers and organizers
     mapping(address => uint256) public balances;
     mapping(address => bool) public isUserRefund;
@@ -92,7 +94,8 @@ contract Event is ERC721, ReentrancyGuard {
         string memory _eventSymbol,
         address _userContract,
         uint256 _eventDate,
-        string memory _eventPlace
+        string memory _eventPlace,
+        string memory _imageUrl
     ) ERC721(_eventName, _eventSymbol) {
         require(
             _royaltyPercent >= 0 && _royaltyPercent <= 100,
@@ -110,6 +113,7 @@ contract Event is ERC721, ReentrancyGuard {
         userContract = _userContract;
         eventDate = _eventDate;
         eventPlace = _eventPlace;
+        imageUrl = _imageUrl;
     }
 
     /**
@@ -309,6 +313,7 @@ contract Event is ERC721, ReentrancyGuard {
             string memory,
             string memory,
             uint256,
+            string memory,
             string memory
         )
     {
@@ -323,7 +328,8 @@ contract Event is ERC721, ReentrancyGuard {
             name(),
             symbol(),
             eventDate,
-            eventPlace
+            eventPlace,
+            imageUrl
         );
     }
 

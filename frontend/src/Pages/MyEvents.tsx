@@ -34,7 +34,7 @@ const MyEvents = () => {
           price: event.price,
           ticketsAvailable: event.numTicketsLeft,
           totalTickets: event.numTickets,
-          imageUrl: "https://via.placeholder.com/500",
+          imageUrl: event.imageUrl,
           organizer: event.owner,
           category: "Uncategorized",
           callback: () => {},

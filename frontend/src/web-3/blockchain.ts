@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ethers } from "ethers";
 
-import { EventCreatorABI, EventABI, UserABI } from "@/lib/abi";
+import { EventCreatorABI, EventABI, UserABI} from "@/lib/abi"
 
 const EVENT_CREATOR_CONTRACT_ADDRESS = import.meta.env
   .VITE_EVENT_CREATOR_CONTRACT_ADDRESS;
@@ -34,7 +34,8 @@ export const createEvent = async (
   eventName: string,
   eventSymbol: string,
   eventDate: number, // Unix timestamp
-  eventPlace: string
+  eventPlace: string,
+  eventUrl: string
 ) => {
   try {
     const signer = await getSigner();
@@ -54,7 +55,8 @@ export const createEvent = async (
       eventSymbol,
       USER_CONTRACT_ADDRESS,
       eventDate,
-      eventPlace
+      eventPlace,
+      eventUrl
     );
 
     await tx.wait();
@@ -329,6 +331,7 @@ export const getEventDetails = async (eventAddress: string) => {
       symbol: details[8],
       date: details[9],
       location: details[10],
+      imageUrl: details[11]
     };
   } catch (error) {
     console.error("Error fetching event details:", error);

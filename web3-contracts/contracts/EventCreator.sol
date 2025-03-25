@@ -26,6 +26,7 @@ contract EventCreator {
      * @param _userContract Address of the User contract
      * @param _eventDate Date of the event (Unix timestamp)
      * @param _eventPlace Place of the event
+     * @param _imageUrl Url of the image of event
      * @return newEvent The address of the newly created event contract
      */
     function createEvent(
@@ -37,7 +38,8 @@ contract EventCreator {
         string memory _eventSymbol,
         address _userContract,
         uint256 _eventDate,
-        string memory _eventPlace
+        string memory _eventPlace,
+        string memory _imageUrl
     ) external returns (address newEvent) {
         // Deploy a new Event contract
         Event e = new Event(
@@ -50,7 +52,8 @@ contract EventCreator {
             _eventSymbol,
             _userContract,
             _eventDate,
-            _eventPlace
+            _eventPlace,
+            _imageUrl
         );
 
         // If it's a new creator, add them to the creator list

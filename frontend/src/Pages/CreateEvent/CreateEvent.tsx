@@ -50,7 +50,7 @@ const CreateEvent = () => {
     setError(null);
 
     try {
-      const { name, totalTickets, price, canBeResold, royaltyPercent, location, date } =
+      const { name, totalTickets, price, canBeResold, royaltyPercent, location, date, imageUrl } =
         formData;
 
       const numTickets = parseInt(totalTickets.toString(), 10);
@@ -66,7 +66,7 @@ const CreateEvent = () => {
       if (isNaN(royalty) || royalty < 0 || royalty > 100) {
         throw new Error("Royalty percent must be between 0 and 100");
       }
-
+      
       await createEvent(
         numTickets,
         ticketPrice,
@@ -76,6 +76,7 @@ const CreateEvent = () => {
         name.substring(0, 3).toUpperCase(),
         new Date(date).getTime(),
         location,
+        imageUrl
       );
 
       setSuccess(true);
