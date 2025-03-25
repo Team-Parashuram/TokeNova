@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { Event } from "../Types/Event.types";
 import { useUserStore } from "@/store/store";
 import { useBalance, useAccount } from "wagmi";
-import { buyTicket, getAllEvents, getEventDetails } from "@/web-3/blockchain";
+import { getAllEvents } from "@/web-3/blockchain";
 import { useState, useEffect, useRef } from "react";
 import { MessageCircleCodeIcon, X, Send } from "lucide-react";
 import ReactMarkdown from "react-markdown";
@@ -20,8 +20,6 @@ const ChatWithAI = () => {
   >([]);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [allEvents, setAllEvents] = useState<Event[]>([]);
-  const [eventId, setEventId] = useState<string | null>(null);
-  const userAddress = useAccount().address;
 
   useEffect(() => {
     async function getData() {
@@ -29,6 +27,7 @@ const ChatWithAI = () => {
         ...event,
         id: event.address
       }));
+
       if (Array.isArray(events)) setAllEvents(events);
     }
     getData();
@@ -55,12 +54,14 @@ const ChatWithAI = () => {
   const handleSend = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+
     if (inputValue.trim()) {
       const userMessage = {
         text: inputValue,
         sender: "user",
         timestamp: new Date().toISOString(),
       };
+
       setMessages((prev) => [...prev, userMessage]);
 
       let formattedBalance = 0;
@@ -82,6 +83,7 @@ const ChatWithAI = () => {
       };
       console.log(payload)
 
+
       const safePayload = JSON.parse(
         JSON.stringify(payload, (_, value) =>
           typeof value === "bigint" ? value.toString() : value
@@ -90,19 +92,14 @@ const ChatWithAI = () => {
 
       try {
         const res = await axios.post(VITE_PY_URL, safePayload);
-
-        if (res.data.response.action === "confirm_booking") {
-          toast.success("Booking confirmed for the event");
-          setEventId(res.data.response.event_id);
-          const ans = await getEventDetails(res.data.response.event_id);
-          buyTicket(userAddress!, eventId!, ans.price);
-        }
+        console.log(res)
         const botMessage = {
           text: DOMPurify.sanitize(res.data.response.message),
           sender: "bot",
           timestamp: new Date().toISOString(),
         };
 
+        console.log(botMessage)
 
         setMessages((prev) => [...prev, botMessage]);
         toast.success("Message sent to AI");

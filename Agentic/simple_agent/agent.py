@@ -77,7 +77,7 @@ class EventBookingSession:
            - Make sure they have sufficient balance
            - Make sure tickets are available
            - Get confirmation from the user before finalizing
-        4. For booking confirmations, respond with {confirmation: event_id}
+        4. For booking confirmations, respond with "Id {event_id} Are you sure ?" in place of message
         """
         
         # Add the context information to help the model make decisions
