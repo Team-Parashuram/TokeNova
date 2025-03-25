@@ -30,21 +30,26 @@ const HomePage = () => {
     const fetchEvents = async () => {
       try {
         const blockchainEvents = await getAllEvents();
-        const mappedEvents: Event[] = blockchainEvents.map((event) => ({
-          id: event.address,
-          name: event.name,
-          description: "Description not available",
-          date: "Date not available",
-          location: "Location not available",
-          price: event.price,
-          ticketsAvailable: event.numTicketsLeft,
-          totalTickets: event.numTickets,
-          imageUrl: event.imageUrl,
-          organizer: event.owner,
-          category: "Category not available",
-          time: "Time not available",
-          callback: () => {},
-        }));
+        
+        const mappedEvents: Event[] = blockchainEvents.map((event) => {
+          console.log("Event image URL:", event.imageUrl);
+          return ({
+            id: event.address,
+            name: event.name,
+            description: event.description,
+            date: event.date,
+            location: event.location,
+            price: event.price,
+            ticketsAvailable: event.numTicketsLeft,
+            totalTickets: event.numTickets,
+            imageUrl: event.imageUrl,
+            organizer: event.owner,
+            category: "Category not available",
+            time: event.time,
+            callback: () => {},
+          })
+      });
+      console.log(mappedEvents)
         setEvents(mappedEvents);
         const uniqueCategories = [
           "All",

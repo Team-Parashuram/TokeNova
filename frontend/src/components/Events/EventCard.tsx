@@ -53,9 +53,36 @@ const EventCard = ({ event, onEventSelect, onCancelEvent }: EventCardProps) => {
 
   // Determine status color based on percentage sold
   const getStatusColor = () => {
-    if (soldPercentage >= 80) return "bg-red-500";
-    if (soldPercentage >= 50) return "bg-amber-500";
-    return "bg-emerald-500";
+    switch (event.description) {
+      case 'Active':
+        return {
+          bg: 'bg-emerald-50',
+          text: 'text-emerald-700',
+          border: 'border-emerald-200',
+          icon: 'bg-emerald-500'
+        };
+      case 'Cancelled':
+        return {
+          bg: 'bg-red-50',
+          text: 'text-red-700',
+          border: 'border-red-200',
+          icon: 'bg-red-500'
+        };
+      case 'Closed':
+        return {
+          bg: 'bg-gray-50',
+          text: 'text-gray-700',
+          border: 'border-gray-200',
+          icon: 'bg-gray-500'
+        };
+      default:
+        return {
+          bg: 'bg-blue-50',
+          text: 'text-blue-700',
+          border: 'border-blue-200',
+          icon: 'bg-blue-500'
+        };
+    }
   };
 
   const activateEvent = async (e: React.MouseEvent) => {
@@ -64,6 +91,10 @@ const EventCard = ({ event, onEventSelect, onCancelEvent }: EventCardProps) => {
     toast.success("Event activated successfully");
   };
 
+  const statusColors = getStatusColor();
+
+
+  
   return (
     <motion.div
       onClick={() => onEventSelect(event)}
@@ -77,7 +108,7 @@ const EventCard = ({ event, onEventSelect, onCancelEvent }: EventCardProps) => {
       transition={{ duration: 0.4, ease: "easeOut" }}
       className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer group border border-gray-200 relative flex flex-col h-full"
     >
-      {/* Image container with gradient overlay */}
+      {/* Image container */}
       <div className="relative h-52 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent z-10">
           <img
@@ -86,7 +117,6 @@ const EventCard = ({ event, onEventSelect, onCancelEvent }: EventCardProps) => {
             className="absolute inset-0 w-full h-full object-cover"
           />
         </div>
-
         {/* Category badge - repositioned */}
         <div className="absolute top-4 left-4 z-20">
           <span className="bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-semibold text-indigo-700 shadow-sm border border-indigo-100">
@@ -201,9 +231,10 @@ const EventCard = ({ event, onEventSelect, onCancelEvent }: EventCardProps) => {
           <span className="line-clamp-1">{event.location}</span>
         </div>
 
-        <p className="text-gray-600 mb-4 line-clamp-2 text-sm flex-grow">
-          {event.description}
-        </p>
+        <div className={`mb-4 ${statusColors.bg} ${statusColors.text} ${statusColors.border} rounded-lg p-2 flex items-center space-x-3 border`}>
+          <span className={`w-3 h-3 ${statusColors.icon} rounded-full`}></span>
+          <span className="text-sm font-medium">{event.description} Event</span>
+        </div>
 
         <div className="pt-4 border-t border-gray-100 mt-auto">
           {/* Price and availability section */}

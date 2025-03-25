@@ -5,7 +5,8 @@ import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { Event } from "../Types/Event.types";
 import { useAccount } from "wagmi";
-import { Calendar, MapPin, Clock, Ticket, Users, Wallet } from "lucide-react";
+import { Calendar, MapPin, Clock, Ticket, Users, Wallet, CheckCircle, XCircle, Archive  } from "lucide-react";
+
 
 interface EventDetailsModalProps {
   event: Event;
@@ -39,6 +40,41 @@ const EventDetailsModal = ({ event, onClose }: EventDetailsModalProps) => {
   const handleCancelBuy = () => {
     setShowConfirmation(false);
   };
+
+  const getStatusIcon = () => {
+    switch (event.description) {
+      case 'Active':
+        return {
+          Icon: CheckCircle,
+          color: 'text-emerald-600',
+          bgColor: 'bg-emerald-50',
+          text: 'Active Event'
+        };
+      case 'Cancelled':
+        return {
+          Icon: XCircle,
+          color: 'text-red-600',
+          bgColor: 'bg-red-50',
+          text: 'Cancelled Event'
+        };
+      case 'Closed':
+        return {
+          Icon: Archive,
+          color: 'text-gray-600',
+          bgColor: 'bg-gray-50',
+          text: 'Closed Event'
+        };
+      default:
+        return {
+          Icon: CheckCircle,
+          color: 'text-blue-600',
+          bgColor: 'bg-blue-50',
+          text: 'Event Status'
+        };
+    }
+  };
+
+  const StatusIcon = getStatusIcon();
 
   return (
     <motion.div
@@ -84,7 +120,13 @@ const EventDetailsModal = ({ event, onClose }: EventDetailsModalProps) => {
             <Ticket className="w-6 h-6 text-indigo-600" />
             <h2 className="text-3xl font-bold text-indigo-700">{event.name}</h2>
           </div>
-          <p className="text-gray-600 mb-6 leading-relaxed">{event.description}</p>
+          <div className={`mb-4 ${StatusIcon.bgColor} ${StatusIcon.color} rounded-lg p-3 flex items-center space-x-3`}>
+            <StatusIcon.Icon className="w-6 h-6" />
+            <div>
+              <p className="text-sm font-medium">{StatusIcon.text}</p>
+              <p className="text-xs opacity-70">Current event status</p>
+            </div>
+          </div>
 
           {/* Event Details Grid */}
           <div className="grid grid-cols-2 gap-5 mb-6">

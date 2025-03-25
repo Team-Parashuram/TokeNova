@@ -18,20 +18,20 @@ export const generateEventDetails = async (prompt: string): Promise<AIGeneratedE
                         parts: [
                             {
                                 text: `Generate an event name, description, and category based on the following prompt: "${prompt}".
-  id: string;
-  name: string;
-  description: string;
-  date: string;
-  location: string;
-  price: string;
-  ticketsAvailable: number;
-  totalTickets: number;
-  imageUrl: string;
-  organizer: string;
-  category: string;
-  time: string;
-  callback: () => void; this is interface in typescript can you fill that accordinly.The category must be one of: Tech, Music, Art, Sports, Business, Education, Other. Return the response as a plain JSON object with keys "name", "description", and "category", without any additional text or code blocks.`
-                            }
+    id: string;
+    name: string;
+    description: string;
+    date: string;
+    location: string;
+    price: string;
+    ticketsAvailable: number;
+    totalTickets: number;
+    imageUrl: string;
+    organizer: string;
+    category: string;
+    time: string;
+    callback: () => void; this is interface in typescript can you fill that accordinly.The category must be one of: Tech, Music, Art, Sports, Business, Education, Other. Return the response as a plain JSON object with keys "name", "description", and "category", without any additional text or code blocks.`
+                                }
                         ]
                     }
                 ]
