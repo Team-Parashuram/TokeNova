@@ -104,7 +104,7 @@ export const getAllEvents = async () => {
               owner: details[0],
               numTickets: Number(details[1]),
               numTicketsLeft: Number(details[2]),
-              price: (details[3]), // Convert wei to ether
+              price: ethers.formatEther(details[3]), // Convert wei to ether
               royaltyPercent: Number(details[4]),
               canBeResold: details[5],
               stage: Number(details[6]),
@@ -186,7 +186,7 @@ export const buyTicket = async (userAddress: string, eventAddress: string, ticke
   const eventContract = new ethers.Contract(eventAddress, EventABI, signer);
   try {
     const tx = await eventContract.buyTicket({
-      value: ethers.parseEther(ticketPrice.toString()),
+      value: ticketPrice,
     });
 
     await tx.wait();
@@ -356,7 +356,7 @@ export const getEventDetails = async (eventAddress: string) => {
       owner: details[0],
       numTickets: Number(details[1]),
       numTicketsLeft: Number(details[2]),
-      price: Number(details[3]),
+      price: ethers.formatEther(details[3]),
       royaltyPercent: Number(details[4]),
       canBeResold: details[5],
       stage: Number(details[6]), // Enum value
